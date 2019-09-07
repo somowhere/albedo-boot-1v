@@ -156,9 +156,13 @@ AlbedoBoot 提供了常用工具进行封装，包括日志工具、缓存工具
 
 ## 启动篇
 
-### 1.2.0 SNAPSHOT 发布了! :tada::tada::tada:
+### 1.3.0 SNAPSHOT 发布了! :tada::tada::tada:
 
 引入 VUE ，基于 ELEMENT [模版](http://element-cn.eleme.io/#/zh-CN) 快速启动(依赖nodejs环境，更新至最新版)
+
+### 1.5.0 SNAPSHOT 发布了! :tada::tada::tada:
+
+[albedo-cloud](https://github.com/somowhere/albedo-cloud) 版本开源
 
 ### 调试模式
 1.  进入 albedo-boot-ui-vue 目录 运行 npm install , 可根据需要修改 config/env.js 配置转发

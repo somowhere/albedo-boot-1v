@@ -107,7 +107,7 @@ public class QueryCondition implements Comparable<QueryCondition>, java.io.Seria
      * @return 等于筛选
      */
     public static QueryCondition eq(String property, Object value) {
-        return new QueryCondition(property, QueryCondition.Operator.eq, value);
+        return new QueryCondition(property, Operator.eq, value);
     }
     /**
      * 返回不等于筛选
@@ -127,7 +127,7 @@ public class QueryCondition implements Comparable<QueryCondition>, java.io.Seria
      * @return 不等于筛选
      */
     public static QueryCondition ne(String property, Object value) {
-        return new QueryCondition(property, QueryCondition.Operator.ne, value);
+        return new QueryCondition(property, Operator.ne, value);
     }
 
     /**
@@ -138,7 +138,7 @@ public class QueryCondition implements Comparable<QueryCondition>, java.io.Seria
      * @return 大于筛选
      */
     public static QueryCondition gt(String property, Object value) {
-        return new QueryCondition(property, QueryCondition.Operator.gt, value);
+        return new QueryCondition(property, Operator.gt, value);
     }
 
     /**
@@ -149,7 +149,7 @@ public class QueryCondition implements Comparable<QueryCondition>, java.io.Seria
      * @return 小于筛选
      */
     public static QueryCondition lt(String property, Object value) {
-        return new QueryCondition(property, QueryCondition.Operator.lt, value);
+        return new QueryCondition(property, Operator.lt, value);
     }
 
     /**
@@ -160,7 +160,7 @@ public class QueryCondition implements Comparable<QueryCondition>, java.io.Seria
      * @return 大于等于筛选
      */
     public static QueryCondition ge(String property, Object value) {
-        return new QueryCondition(property, QueryCondition.Operator.ge, value);
+        return new QueryCondition(property, Operator.ge, value);
     }
 
     /**
@@ -171,7 +171,7 @@ public class QueryCondition implements Comparable<QueryCondition>, java.io.Seria
      * @return 小于等于筛选
      */
     public static QueryCondition le(String property, Object value) {
-        return new QueryCondition(property, QueryCondition.Operator.le, value);
+        return new QueryCondition(property, Operator.le, value);
     }
 
     /**
@@ -182,7 +182,7 @@ public class QueryCondition implements Comparable<QueryCondition>, java.io.Seria
      * @return 相似筛选
      */
     public static QueryCondition like(String property, Object value) {
-        return new QueryCondition(property, QueryCondition.Operator.like, value);
+        return new QueryCondition(property, Operator.like, value);
     }
 
     /**
@@ -193,7 +193,7 @@ public class QueryCondition implements Comparable<QueryCondition>, java.io.Seria
      * @return 包含筛选
      */
     public static QueryCondition in(String property, Object value) {
-        return new QueryCondition(property, QueryCondition.Operator.in, value);
+        return new QueryCondition(property, Operator.in, value);
     }
 
     /**
@@ -203,7 +203,7 @@ public class QueryCondition implements Comparable<QueryCondition>, java.io.Seria
      * @return 为Null筛选
      */
     public static QueryCondition isNull(String property) {
-        return new QueryCondition(property, QueryCondition.Operator.isNull, null);
+        return new QueryCondition(property, Operator.isNull, null);
     }
 
     /**
@@ -213,7 +213,7 @@ public class QueryCondition implements Comparable<QueryCondition>, java.io.Seria
      * @return 不为Null筛选
      */
     public static QueryCondition isNotNull(String property) {
-        return new QueryCondition(property, QueryCondition.Operator.isNotNull, null);
+        return new QueryCondition(property, Operator.isNotNull, null);
     }
 
     public String getFieldNode() {

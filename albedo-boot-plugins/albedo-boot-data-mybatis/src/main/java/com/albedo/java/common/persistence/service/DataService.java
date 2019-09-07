@@ -14,8 +14,8 @@ import com.albedo.java.util.domain.ComboData;
 import com.albedo.java.util.domain.ComboSearch;
 import com.albedo.java.util.domain.PageModel;
 import com.albedo.java.util.domain.QueryCondition;
-import com.baomidou.mybatisplus.mapper.Condition;
-import com.baomidou.mybatisplus.mapper.SqlHelper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
@@ -31,30 +31,13 @@ import java.util.List;
 public abstract class DataService<Repository extends BaseRepository<T, PK>, T extends DataEntity, PK extends Serializable>
         extends BaseService<Repository, T, PK> {
 
-    @Transactional(readOnly = true, rollbackFor = Exception.class)
-    @Override
-    public T findOne(PK id) {
-        return repository.selectById(id);
-    }
 
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public T findRelationOne(Serializable id) {
-        List<T> relationList = repository.findRelationList(Condition.create().eq(getClassNameProfix()+DataEntity.F_SQL_ID, id));
+        List<T> relationList = repository.findRelationList(new QueryWrapper<T>().eq(getClassNameProfix()+DataEntity.F_SQL_ID, id));
         return SqlHelper.getObject(relationList);
     }
 
-
-    /**
-     * 逻辑删除 集合
-     *
-     * @param idList
-     * @return
-     */
-    public void deleteById(List<PK> idList) {
-        for (PK id : idList) {
-            deleteById(id);
-        }
-    }
 
     public void lockOrUnLock(List<PK> ids) {
         ids.forEach(id -> {
@@ -67,6 +50,7 @@ public abstract class DataService<Repository extends BaseRepository<T, PK>, T ex
         });
     }
 
+    @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public PageModel<T> findPage(PageModel<T> pm) {
         return findPageQuery(pm, null);
@@ -100,7 +84,4 @@ public abstract class DataService<Repository extends BaseRepository<T, PK>, T ex
         return findPage(pm, specificationDetail);
     }
 
-    public List<ComboData> findJson(ComboSearch comboSearch) {
-        return jpaCustomeRepository.findJson(comboSearch);
-    }
 }

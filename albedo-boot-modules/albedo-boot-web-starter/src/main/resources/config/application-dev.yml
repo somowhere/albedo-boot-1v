@@ -26,13 +26,18 @@ spring:
         url: jdbc:mysql://localhost:3306/albedo-new?useUnicode=true&characterEncoding=utf8&useSSL=false
         name:
         username: root
-        password: 123456
+        password: 111111
         hikari:
             data-source-properties:
                 cachePrepStmts: true
                 prepStmtCacheSize: 250
                 prepStmtCacheSqlLimit: 2048
                 useServerPrepStmts: true
+    mail:
+        host: localhost
+        port: 25
+        username:
+        password:
     mvc:
 #        view:
 #            prefix: /WEB-INF/views/
@@ -52,13 +57,15 @@ server:
 #    jsp-servlet:
 #        class-name: org.apache.jasper.servlet.JspServlet
 
+logging:
+    path: .log/albedo-boot-web
 
 
 # ===================================================================
 # Albedo specific properties
 # ===================================================================
 
-albedo:
+application:
     jedisKeyPrefix: albedoBootWebApp
     developMode: true
     isTokenInterceptor: false
@@ -87,7 +94,7 @@ albedo:
             enabled: false
             host: localhost
             port: 2003
-            prefix: albedoBootCloudGateway
+            prefix: albedoBootWebStarter
         prometheus: # Use the "prometheus" Maven profile to have the Prometheus dependencies
             enabled: false
             endpoint: /prometheusMetrics

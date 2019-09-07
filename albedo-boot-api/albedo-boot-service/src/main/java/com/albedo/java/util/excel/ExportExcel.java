@@ -439,8 +439,9 @@ public class ExportExcel {
                     log.info(ex.toString());
                     val = "";
                 }
-                if (PublicUtil.isNotEmpty(val) && val instanceof String && 0 == ef.trim())
+                if (PublicUtil.isNotEmpty(val) && val instanceof String && ef.trim()) {
                     val = val.toString().replace(" ", "");
+                }
                 this.addCell(row, colunm++, val, ef.align(), ef.fieldType());
                 sb.append(val + ", ");
             }

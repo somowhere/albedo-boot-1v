@@ -1,6 +1,6 @@
 package com.albedo.java.util;
 
-import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +16,7 @@ import java.util.UUID;
  * @author Lijie
  * @version 2013-06-21
  */
-public class FileUtil extends FieldUtils {
+public class FileUtil extends FileUtils {
 
     private static Logger log = LoggerFactory.getLogger(FileUtil.class);
 
@@ -465,8 +465,15 @@ public class FileUtil extends FieldUtils {
      * @param append
      */
     public static void writeToFile(String fileName, String content, String encoding, boolean append) {
-        FileUtil.writeToFile(fileName, content, encoding, append);
-        log.debug("文件 " + fileName + " 写入成功!");
+        try {
+            FileUtils.write(new File(fileName), content, encoding, append);
+            log.debug("文件 " + fileName + " 写入成功!");
+        } catch (IOException e) {
+            log.error("{}",e);
+        }
     }
+
+
+
 
 }

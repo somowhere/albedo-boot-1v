@@ -22,18 +22,18 @@ public final class RandomUtil {
     }
 
     /**
-     * Generates an activation key.
+     * Generates an activation T.
      *
-     * @return the generated activation key
+     * @return the generated activation T
      */
     public static String generateActivationKey() {
         return RandomStringUtils.randomNumeric(DEF_COUNT);
     }
 
     /**
-     * Generates a reset key.
+     * Generates a reset T.
      *
-     * @return the generated reset key
+     * @return the generated reset T
      */
     public static String generateResetKey() {
         return RandomStringUtils.randomNumeric(DEF_COUNT);

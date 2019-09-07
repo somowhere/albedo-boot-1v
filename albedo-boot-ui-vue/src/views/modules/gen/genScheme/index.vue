@@ -63,7 +63,7 @@
 
       <el-table-column align="center" class-name="status-col" label="状态">
         <template slot-scope="scope">
-          <el-tag>{{scope.row.status}}</el-tag>
+          <el-tag>{{scope.row.statusText}}</el-tag>
         </template>
       </el-table-column>
 
@@ -239,7 +239,7 @@
     };
   },
   computed: {
-    ...mapGetters(['authorities'])
+    ...mapGetters(["authorities","dicts"])
   },
   filters: {
     statusFilter(status) {
@@ -255,9 +255,7 @@
     this.getList();
     this.gen_genScheme_edit = this.authorities.indexOf("gen_genScheme_edit") !== -1;
     this.gen_genScheme_delete = this.authorities.indexOf("gen_genScheme_delete") !== -1;
-    dictCodes({codes:'sys_status'}).then(response => {
-      this.statusOptions = response.data[0];
-    });
+    this.statusOptions = this.dicts["sys_status"];
   },
   methods: {
     getList() {

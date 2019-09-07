@@ -29,9 +29,9 @@ public class AreaVo extends TreeEntityVo {
      */
     public static final String F_SHORTNAME = "shortName";
     /**
-     * F_LEVEL level_  :  区域等级(1省/2市/3区县)
+     * F_GRADE grade_  :  区域等级
      */
-    public static final String F_LEVEL = "level";
+    public static final String F_GRADE = "grade";
     /**
      * F_CODE code_  :  区域编码
      */
@@ -45,10 +45,10 @@ public class AreaVo extends TreeEntityVo {
     @Size(max = 32)
     private String shortName;
     /**
-     * level 区域等级(1省/2市/3区县)
+     * grade 区域等级(1省/2市/3区县)
      */
 
-    private Integer level;
+    private Integer grade;
     /**
      * code 区域编码
      */

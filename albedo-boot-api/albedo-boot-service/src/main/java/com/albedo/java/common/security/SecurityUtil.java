@@ -1,11 +1,14 @@
 package com.albedo.java.common.security;
 
-import com.albedo.java.common.config.AlbedoProperties;
+import com.albedo.java.common.AuthoritiesConstants;
+import com.albedo.java.common.config.ApplicationProperties;
 import com.albedo.java.common.persistence.domain.BaseEntity;
 import com.albedo.java.modules.sys.domain.*;
-import com.albedo.java.modules.sys.repository.UserRepository;
 import com.albedo.java.modules.sys.service.*;
-import com.albedo.java.util.*;
+import com.albedo.java.util.RedisUtil;
+import com.albedo.java.util.Json;
+import com.albedo.java.util.PublicUtil;
+import com.albedo.java.util.StringUtil;
 import com.albedo.java.util.domain.Globals;
 import com.albedo.java.util.domain.QueryCondition;
 import com.albedo.java.util.exception.RuntimeMsgException;
@@ -15,19 +18,17 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.CacheManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -45,15 +46,18 @@ public final class SecurityUtil {
     public static final String CACHE_AREA_LIST = "cachaAreaList";
     /*** 当前用户拥有 模块集合 */
     public static final String CACHE_MODULE_LIST = "cachaModuleList";
+    /*** 当前用户拥有 模块集合 */
+    public static final String CACHE_MODULE_ALL_LIST = "cachaModuleAllList";
     /*** 当前用户拥有 角色集合 */
     public static final String CACHE_ROLE_LIST = "cachaRoleList";
     public static final String STAFF_PRINCIPAL = "principal";
-    public static UserService userService = SpringContextHolder.getBean(UserService.class);
+
+    public static UserSecurtyService userSecurtyService = SpringContextHolder.getBean(UserSecurtyService.class);
     public static AreaService areaService = SpringContextHolder.getBean(AreaService.class);
     public static RoleService roleService = SpringContextHolder.getBean(RoleService.class);
     public static OrgService orgService = SpringContextHolder.getBean(OrgService.class);
     public static ModuleService moduleService = SpringContextHolder.getBean(ModuleService.class);
-    public static AlbedoProperties albedoProperties = SpringContextHolder.getBean(AlbedoProperties.class);
+    public static ApplicationProperties applicationProperties = SpringContextHolder.getBean(ApplicationProperties.class);
     protected static Logger logger = LoggerFactory.getLogger(SecurityUtil.class);
     private static Map<String, Object> dataMap = Maps.newHashMap();
 
@@ -91,7 +95,7 @@ public final class SecurityUtil {
      * @return 取不到返回null
      */
     public static User getByUserId(String userId) {
-        User user = JedisUtil.getJson(USER_CACHE, USER_CACHE_ID_ + userId, User.class);
+        User user = RedisUtil.getJson(USER_CACHE, USER_CACHE_ID_ + userId, User.class);
         boolean isSearch = false;
         if (user != null && PublicUtil.isNotEmpty(user.getRoles())) {
             for (Role role : user.getRoles()) {
@@ -102,15 +106,15 @@ public final class SecurityUtil {
             }
         }
         if (user == null || isSearch || PublicUtil.isEmpty(user.getRoles()) ||
-                user.getRoles().size() != user.getRoleIdList().size()) {
-            user = userService.findOneById(userId);
+            user.getRoles().size() != user.getRoleIdList().size()) {
+            user = userSecurtyService.findOneById(userId);
 
             if (user == null) {
-                throw new UsernameNotFoundException("User " + userId + " was not found in the database");
+                throw new RuntimeMsgException("User " + userId + " was not found in the database");
             }
             String json = Json.toJsonString(user);
-            JedisUtil.put(USER_CACHE, USER_CACHE_ID_ + user.getId(), json);
-            JedisUtil.put(USER_CACHE, USER_CACHE_LOGIN_NAME_ + user.getLoginId(), json);
+            RedisUtil.put(USER_CACHE, USER_CACHE_ID_ + user.getId(), json);
+            RedisUtil.put(USER_CACHE, USER_CACHE_LOGIN_NAME_ + user.getLoginId(), json);
         }
         return user;
     }
@@ -122,16 +126,16 @@ public final class SecurityUtil {
      * @return 取不到返回null
      */
     public static User getByLoginId(final String loginId) {
-        User user = JedisUtil.getJson(USER_CACHE, USER_CACHE_LOGIN_NAME_ + loginId, User.class);
+        User user = RedisUtil.getJson(USER_CACHE, USER_CACHE_LOGIN_NAME_ + loginId, User.class);
         if (user == null||PublicUtil.isEmpty(user.getId())) {
-            user = userService.findOneByLoginId(loginId).map(u -> {
+            user = userSecurtyService.findOneByLoginId(loginId).map(u -> {
 
                 if(!BaseEntity.FLAG_NORMAL.equals(u.getStatus())){
                     throw new RuntimeMsgException("用户 " + loginId + " 登录信息已被锁定");
                 }
-                String json = Json.toJsonString(u);
-                JedisUtil.put(USER_CACHE, USER_CACHE_ID_ + u.getId(), json);
-                JedisUtil.put(USER_CACHE, USER_CACHE_LOGIN_NAME_ + u.getLoginId(), json);
+                String json = Json.toJSONString(u);
+                RedisUtil.put(USER_CACHE, USER_CACHE_ID_ + u.getId(), json);
+                RedisUtil.put(USER_CACHE, USER_CACHE_LOGIN_NAME_ + u.getLoginId(), json);
                 return u;
             }).orElseThrow(() -> new RuntimeMsgException("用户 " + loginId + " 不存在"));
 
@@ -155,9 +159,9 @@ public final class SecurityUtil {
      * @return
      */
     public static List<Module> getModuleList() {
-        List<Module> moduleList = getModuleList(false, null);
-        logger.info("{}", moduleList);
-        return moduleList;
+        List<Module> resourceList = getModuleList(false, null);
+        logger.debug("{}", resourceList);
+        return resourceList;
     }
 
     public static List<Module> getMenuList() {
@@ -169,7 +173,21 @@ public final class SecurityUtil {
     public static List<Module> getModuleList(String userId) {
         return getModuleList(false, userId);
     }
-
+    /**
+     * 返回当前用户可操作状态不为已删除的所有模块
+     *
+     * @return
+     */
+    public static List<Module> getModuleAllList() {
+        String resourceListStr = (String) RedisUtil.getSys(CACHE_MODULE_ALL_LIST);
+        List<Module> resourceList = PublicUtil.isNotEmpty(resourceListStr)?
+            Json.parseArray(resourceListStr, Module.class) : null;
+        if (PublicUtil.isEmpty(resourceList)) {
+            resourceList = moduleService.findAllByStatusNotOrderBySort(Module.FLAG_DELETE);
+            RedisUtil.putSys(CACHE_MODULE_ALL_LIST, Json.toJsonString(resourceList));
+        }
+        return resourceList;
+    }
     /**
      * 返回当前用户可操作状态不为已删除的所有模块
      *
@@ -180,14 +198,25 @@ public final class SecurityUtil {
         if (PublicUtil.isEmpty(userId)) {
             userId = getCurrentUserId();
         }
-        List<Module> moduleList = getCacheJsonArray(CACHE_MODULE_LIST, userId, Module.class);
-        if (PublicUtil.isEmpty(moduleList) || refresh) {
-            moduleList = SecurityAuthUtil.isAdmin(userId) ?
-                    moduleService.findAllByStatusOrderBySort(Module.FLAG_NORMAL)
-                    : moduleService.findAllAuthByUser(userId);
-            putCache(CACHE_MODULE_LIST, Json.toJsonString(moduleList), userId);
+        if(PublicUtil.isEmpty(userId)){
+            return Lists.newArrayList();
         }
-        return moduleList;
+        List<Module> resourceList = getCacheJsonArray(CACHE_MODULE_LIST, userId, Module.class);
+        if (PublicUtil.isEmpty(resourceList) || refresh) {
+            resourceList = SecurityAuthUtil.isSystemAdmin(userId) ?
+                moduleService.findAllByStatusNotOrderBySort(Module.FLAG_DELETE)
+                : moduleService.findAllAuthByUser(userId);
+            if(!SecurityAuthUtil.isSystemAdmin(userId)){
+                for(Module resource :resourceList){
+                    if(AuthoritiesConstants.ADMIN.equals(resource.getPermission())){
+                        resourceList = moduleService.findAllByStatusOrderBySort(Module.FLAG_NORMAL);
+                        break;
+                    }
+                }
+            }
+            putCache(CACHE_MODULE_LIST, Json.toJsonString(resourceList), userId);
+        }
+        return resourceList;
     }
 
     public static List<Area> getAreaList() {
@@ -200,12 +229,10 @@ public final class SecurityUtil {
     }
 
     public static List<Org> getOrgList() {
-        String userId = getCurrentUserId();
         List<Org> orgList = getCacheJsonArray(CACHE_ORG_LIST, Org.class);
         if (PublicUtil.isEmpty(orgList)) {
-
             orgList = orgService.findAllList(SecurityUtil.isAdmin(),
-                    SecurityUtil.dataScopeFilter(getCurrentUserId(), "this", ""));
+                SecurityUtil.dataScopeFilter(getCurrentUserId(), "this", ""));
             putCache(CACHE_ORG_LIST, Json.toJsonString(orgList));
         }
         return orgList;
@@ -216,8 +243,12 @@ public final class SecurityUtil {
         List<Role> roleList = getCacheJsonArray(CACHE_ROLE_LIST, Role.class);
         if (PublicUtil.isEmpty(roleList)) {
             roleList = roleService.findAllList(SecurityAuthUtil.isAdmin(userId),
-                    SecurityUtil.dataScopeFilter(SecurityUtil.getCurrentUserId(), "org", "creator"));
+                SecurityUtil.dataScopeFilter(SecurityUtil.getCurrentUserId(), "org", "creator"));
             putCache(CACHE_ROLE_LIST, Json.toJsonString(roleList));
+        }
+
+        if(roleList == null){
+            roleList = new ArrayList<>();
         }
         return roleList;
     }
@@ -276,19 +307,16 @@ public final class SecurityUtil {
             String value = PublicUtil.toStrString(getCacheDefult(key, null, getCurrentUserId()));
             return Json.parseArray(value, clazz);
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("getCacheJsonArray msg {}", e.getMessage());
             return null;
         }
 
     }
-
     public static <T> List<T> getCacheJsonArray(String key, String userId, Class<T> clazz) {
         try {
             String value = PublicUtil.toStrString(getCacheDefult(key, null, userId));
             return Json.parseArray(value, clazz);
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("getCacheJsonArray userId msg {}", e.getMessage());
             return null;
         }
@@ -324,12 +352,12 @@ public final class SecurityUtil {
             logger.error("login user is null, get userCache failed");
         } else {
             String realKey = getUserKey(key, userId);
-            if (albedoProperties.getCluster()) {
-                obj = JedisUtil.getUser(realKey);
+            if (applicationProperties.getCluster()) {
+                obj = RedisUtil.getUser(realKey);
             } else {
                 obj = dataMap.get(realKey);
                 if (obj == null) {
-                    obj = JedisUtil.getUser(realKey);
+                    obj = RedisUtil.getUser(realKey);
                     dataMap.put(realKey, obj);
                 }
             }
@@ -349,13 +377,13 @@ public final class SecurityUtil {
         if (PublicUtil.isEmpty(userId)) {
             logger.error("login user is null, put userCache failed");
         } else {
-            // JedisUtil.mapObjectPut(USER_CACHE, PublicUtil.toAppendStr("_",
-            // key, "_", userId), value);
+            // RedisUtil.mapObjectPut(USER_CACHE, PublicUtil.toAppendStr("_",
+            // T, "_", userId), value);
             String realKey = getUserKey(key, userId);
-            if (!albedoProperties.getCluster()) {
+            if (!applicationProperties.getCluster()) {
                 dataMap.put(realKey, value);
             }
-            JedisUtil.putUser(realKey, value);
+            RedisUtil.putUser(realKey, value);
         }
     }
 
@@ -370,19 +398,19 @@ public final class SecurityUtil {
     public static void removeCache(String key, String userId) {
 
         String realKey = getUserKey(key, userId);
-        JedisUtil.removeUser(realKey);
-        if (!albedoProperties.getCluster()) {
+        RedisUtil.removeUser(realKey);
+        if (!applicationProperties.getCluster()) {
             dataMap.remove(realKey);
         }
 
         // Map<String, Object> map = (Map<String, Object>)
-        // JedisUtil.getObject();
+        // RedisUtil.getObject();
         // Iterator<String> keys = map.keySet().iterator();
         // String temp = null;
         // while (keys.hasNext()) {
         // temp = keys.next();
-        // if (temp.contains(PublicUtil.toAppendStr("_", key, "_", userId))) {
-        // JedisUtil.mapObjectRemove(USER_CACHE, temp);
+        // if (temp.contains(PublicUtil.toAppendStr("_", T, "_", userId))) {
+        // RedisUtil.mapObjectRemove(USER_CACHE, temp);
         // }
         // }
     }
@@ -391,7 +419,7 @@ public final class SecurityUtil {
      * 清除所有数据jedis用户缓存
      */
     public static void clearUserJedisCache() {
-        JedisUtil.clearAllCacheUser();
+        RedisUtil.clearAllCacheSys();
         dataMap.clear();
     }
 
@@ -399,7 +427,7 @@ public final class SecurityUtil {
      * 清除所有数据本地用户缓存
      */
     public static void clearUserLocalCache() {
-        JedisUtil.removeCache(USER_CACHE);
+        RedisUtil.removeCache(USER_CACHE);
     }
 
     public static boolean hasPermission(String permission) {
@@ -410,9 +438,9 @@ public final class SecurityUtil {
         if (PublicUtil.isEmpty(permission)) {
             return false;
         }
-        permission = PublicUtil.toAppendStr(",", permission, ",");
-        for (Module module : list) {
-            if (permission.contains(PublicUtil.toAppendStr(",", module.getPermission(), ","))) {
+        permission = PublicUtil.toAppendStr(StringUtil.SPLIT_DEFAULT, permission, StringUtil.SPLIT_DEFAULT);
+        for (Module resource : list) {
+            if (permission.contains(PublicUtil.toAppendStr(StringUtil.SPLIT_DEFAULT, resource.getPermission(), StringUtil.SPLIT_DEFAULT))) {
                 return true;
             }
         }
@@ -426,7 +454,7 @@ public final class SecurityUtil {
      * @return 标准连接条件对象
      */
     public static List<QueryCondition> dataScopeFilterSql(String orgAlias, String userAlias) {
-        if(albedoProperties.getTestMode()){
+        if(applicationProperties.getTestMode()){
             return null;
         }
         return dataScopeFilter(getCurrentUserId(), orgAlias, userAlias, true);
@@ -495,16 +523,16 @@ public final class SecurityUtil {
                         } else if (RoleVo.DATA_SCOPE_ORG_AND_CHILD.equals(r.getDataScope())) {
                             queryConditions.add(QueryCondition.eq(tempOrgId, userOrgId));
                             queryConditions.add(QueryCondition.like(PublicUtil.toAppendStr(oa, isSql ? ".parent_ids" : ".parentIds"),
-                                    PublicUtil.toAppendStr(user.getOrg().getParentIds(), userOrgId, ",%'")));
+                                PublicUtil.toAppendStr(user.getOrg().getParentIds(), userOrgId, ",%'")));
                         } else if (RoleVo.DATA_SCOPE_ORG.equals(r.getDataScope())) {
                             queryConditions.add(QueryCondition.eq(tempOrgId, userOrgId));
                             queryConditions
-                                    .add(QueryCondition.eq(PublicUtil.toAppendStr(oa, isSql ? ".parent_id" : ".parentId"), userOrgId));
+                                .add(QueryCondition.eq(PublicUtil.toAppendStr(oa, isSql ? ".parent_id" : ".parentId"), userOrgId));
                         } else if (RoleVo.DATA_SCOPE_SELF.equals(r.getDataScope())
-                                || RoleVo.DATA_SCOPE_CUSTOM.equals(r.getDataScope())) {
+                            || RoleVo.DATA_SCOPE_CUSTOM.equals(r.getDataScope())) {
                             if (PublicUtil.isNotEmpty(r.getOrgIds())) {
                                 queryConditions.add(QueryCondition.in(tempOrgId,
-                                        Lists.newArrayList(StringUtil.splitDefault(r.getOrgIds()))));
+                                    Lists.newArrayList(StringUtil.splitDefault(r.getOrgIds()))));
                             }
                         }
                         dataScope.add(String.valueOf(r.getDataScope()));

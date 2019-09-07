@@ -1,7 +1,7 @@
 package com.albedo.java.common.security;
 
-import com.albedo.java.common.config.AlbedoProperties;
-import com.albedo.java.util.spring.SpringContextHolder;
+import com.albedo.java.common.AuthoritiesConstants;
+import com.albedo.java.modules.sys.domain.Module;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -10,7 +10,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.security.MessageDigest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Utility class for Spring Security.
@@ -22,8 +25,22 @@ public final class SecurityAuthUtil {
     private SecurityAuthUtil() {
     }
 
-    public static boolean isAdmin(String id) {
+
+    public static boolean isSystemAdmin(String id) {
         return "1".equals(id);
+    }
+
+    public static boolean isAdmin(String id) {
+        boolean admin = isSystemAdmin(id);
+        if(!admin){
+            List<Module> moduleList = SecurityUtil.getModuleList(false, id);
+            for (Module item : moduleList){
+                if(AuthoritiesConstants.ADMIN.equals(item.getPermission())){
+                    admin=true;break;
+                }
+            }
+        }
+        return admin;
     }
 
 
@@ -33,9 +50,9 @@ public final class SecurityAuthUtil {
      * @return the login of the current user
      */
     public static String getCurrentUserLogin() {
+        String userName = null;
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
-        String userName = null;
         if (authentication != null) {
             if (authentication.getPrincipal() instanceof UserPrincipal) {
                 UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
@@ -47,6 +64,8 @@ public final class SecurityAuthUtil {
                 userName = (String) authentication.getPrincipal();
             }
         }
+
+
         return userName;
     }
 

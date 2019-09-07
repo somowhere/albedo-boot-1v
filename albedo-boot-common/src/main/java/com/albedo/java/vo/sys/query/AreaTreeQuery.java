@@ -15,6 +15,8 @@ public class AreaTreeQuery {
     private String all;
     private String parentId;
     private String extId;
+    private Integer ltGrade;
+    private Integer grade;
     private Integer ltLevel;
     private Integer level;
 

@@ -15,7 +15,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import org.hibernate.validator.constraints.*;
+import javax.validation.constraints.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -36,10 +36,6 @@ public class ${ClassName}Vo extends DataEntityVo<${table.pkJavaType}> {
 	</#list>
 
 	<@generateFields/>
-
-    public ${ClassName}Vo(${table.pkJavaType} id){
-	    this.setId(id);
-    }
 
 }
 <#macro generateFields>

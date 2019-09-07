@@ -46,7 +46,7 @@
 
           <el-table-column align="center" label="类型">
             <template slot-scope="scope">
-              <span>{{scope.row.type}}</span>
+              <span>{{scope.row.typeText}}</span>
             </template>
           </el-table-column>
 
@@ -73,7 +73,7 @@
           </el-table-column>
           <el-table-column align="center" class-name="status-col" label="状态">
             <template slot-scope="scope">
-              <el-tag>{{scope.row.status}}</el-tag>
+              <el-tag>{{scope.row.statusText}}</el-tag>
             </template>
           </el-table-column>
           <el-table-column align="center" label="更新时间">
@@ -3409,16 +3409,13 @@
       this.sys_module_edit = this.authorities.indexOf("sys_module_edit") !== -1;
       this.sys_module_lock = this.authorities.indexOf("sys_module_lock") !== -1;
       this.sys_module_delete = this.authorities.indexOf("sys_module_delete") !== -1;
-
-      dictCodes({codes:'sys_status,sys_module_type,sys_request_method'}).then(rs => {
-        this.statusOptions = rs.data[0];
-        this.typeOptions = rs.data[1];
-        this.methodOptions = rs.data[2];
-      });
+      this.statusOptions = this.dicts["sys_status"];
+      this.typeOptions = this.dicts["sys_module_type"];
+      this.methodOptions = this.dicts["sys_request_method"];
     },
     computed: {
       ...mapGetters([
-        "menu",  "authorities"
+        "menu",  "authorities","dicts"
       ])
     },
     methods: {

@@ -1,7 +1,6 @@
 package com.albedo.java.util;
 
 import com.albedo.java.util.annotation.SearchField;
-import com.albedo.java.util.base.Collections3;
 import com.albedo.java.util.base.Encodes;
 import com.albedo.java.util.base.Reflections;
 import com.albedo.java.util.config.SystemConfig;
@@ -10,6 +9,7 @@ import com.albedo.java.util.domain.QueryCondition.Operator;
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.albedo.java.util.base.Collections3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +29,7 @@ public class QueryUtil {
      * json 转换 查询集合
      *
      * @param queryConditionJson 格式
-     *                           [{"fieldName":"loginId","operation":"like","weight":0,"value":"ss"}]
+     *                           [{"fieldName":"loginIdStringUtil.SPLIT_DEFAULToperation":"likeStringUtil.SPLIT_DEFAULTweight":0,"value":"ss"}]
      * @return
      */
     public static List<QueryCondition> convertJsonToQueryCondition(String queryConditionJson) {
@@ -53,7 +53,7 @@ public class QueryUtil {
      * 将查询json字符串转换为hql查询条件语句
      *
      * @param queryConditionJson 格式
-     *                           [{"fieldName":"loginId","operation":"like","weight":0,"value":"ss"}]
+     *                           [{"fieldName":"loginIdStringUtil.SPLIT_DEFAULToperation":"likeStringUtil.SPLIT_DEFAULTweight":0,"value":"ss"}]
      * @param paramMap           参数map
      * @return
      */
@@ -124,16 +124,16 @@ public class QueryUtil {
                 //sql合法性检查
                 if (queryCondition != null && queryCondition.legalityCheck()) {
                     if (PublicUtil.isEmpty(operate)) {
-                        queryCondition.setOperate(Operator.eq.getOperator());
+                        queryCondition.setOperate(QueryCondition.Operator.eq.getOperator());
                     }
                     sb.append(" ").append(isAnd ? SystemConfig.CONDITION_AND : SystemConfig.CONDITION_OR)
                             .append(SystemConfig.SPACE).append(argStr + queryCondition.getFieldName()).append(" ")
                             .append(operate);
-                    if (!Operator.isNotNull.equals(queryCondition.getOperate())
-                            && !Operator.isNull.equals(queryCondition.getOperate())) {
+                    if (!QueryCondition.Operator.isNotNull.equals(queryCondition.getOperate())
+                            && !QueryCondition.Operator.isNull.equals(queryCondition.getOperate())) {
                         String paramFieldName = PublicUtil.toAppendStr(argStr, queryCondition.getFieldName())
                                 .replace(".", "_");
-                        if (paramFieldName.contains(",")) {
+                        if (paramFieldName.contains(StringUtil.SPLIT_DEFAULT)) {
                             paramFieldName = PublicUtil.getRandomString(6);
                         }
                         switch (operate) {
@@ -141,7 +141,7 @@ public class QueryUtil {
                             case SystemConfig.CONDITION_NOTIN:
                                 if (queryCondition.getValue() instanceof String) {
                                     String val = String.valueOf(queryCondition.getValue());
-                                    queryCondition.setValue(val.contains(",") ? Lists.newArrayList(val.split(","))
+                                    queryCondition.setValue(val.contains(StringUtil.SPLIT_DEFAULT) ? Lists.newArrayList(val.split(StringUtil.SPLIT_DEFAULT))
                                             : Lists.newArrayList(val));
                                 }
                                 if (queryCondition.getValue() instanceof Collection) {
@@ -155,7 +155,7 @@ public class QueryUtil {
                                             paramMap.put(PublicUtil.toAppendStr(paramFieldName, i),
                                                     getQueryValue(queryCondition, iterator.next()));
                                         }
-                                        sb.delete(sb.lastIndexOf(","), sb.length()).append(")");
+                                        sb.delete(sb.lastIndexOf(StringUtil.SPLIT_DEFAULT), sb.length()).append(")");
                                     }
                                 } else {
                                     logger.warn(PublicUtil.toAppendStr("queryFieldName[", paramFieldName,
@@ -275,7 +275,7 @@ public class QueryUtil {
      * @param operateMap
      * @return
      */
-    public static List<QueryCondition> convertObjectToQueryCondition(Object entity, Map<String, Operator> operateMap) {
+    public static List<QueryCondition> convertObjectToQueryCondition(Object entity, Map<String, QueryCondition.Operator> operateMap) {
         List<QueryCondition> list = Lists.newArrayList();
         if (PublicUtil.isNotEmpty(entity)) {
             Object val = null;
@@ -309,7 +309,7 @@ public class QueryUtil {
                             val = Reflections.getFieldValue(obj, key);
                             an = Reflections.getAnnotation(obj, key, SearchField.class);
                         } catch (Exception e) {
-                            logger.info("key:{} exception:{} ", key, e.getMessage());
+                            logger.info("T:{} exception:{} ", key, e.getMessage());
                             continue;
                         }
                         if (PublicUtil.isNotEmpty(val) && an != null) {
@@ -439,7 +439,7 @@ public class QueryUtil {
             }
         }
         sb.append(tempSb.toString());
-        return sb.toString().split(",");
+        return sb.toString().split(StringUtil.SPLIT_DEFAULT);
     }
 
 }

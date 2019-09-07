@@ -5,7 +5,7 @@
     <parent>
         <artifactId>albedo-boot-api</artifactId>
         <groupId>com.albedo.java</groupId>
-        <version>1.3.0-SNAPSHOT</version>
+        <version>1.3.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -18,10 +18,6 @@
         </dependency>
 
         <!-- EHCACHE begin -->
-        <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>

@@ -8,7 +8,7 @@ import com.albedo.java.common.security.SecurityUtil;
 import com.albedo.java.common.security.jwt.JWTConfigurer;
 import com.albedo.java.common.security.jwt.TokenProvider;
 import com.albedo.java.common.security.service.InvocationSecurityMetadataSourceService;
-import com.albedo.java.util.JedisUtil;
+import com.albedo.java.util.RedisUtil;
 import com.albedo.java.util.domain.GlobalJedis;
 import org.assertj.core.util.Lists;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -37,7 +37,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.filter.CorsFilter;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.util.List;
 
 
@@ -51,20 +50,20 @@ public class SecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final CustomizeAccessDecisionManager customizeAccessDecisionManager;
     private final InvocationSecurityMetadataSourceService invocationSecurityMetadataSourceService;
-    private final AlbedoProperties albedoProperties;
+    private final ApplicationProperties applicationProperties;
     private final UserDetailsService userDetailsService;
     private final TokenProvider tokenProvider;
     private final CorsFilter corsFilter;
 
     public SecurityAutoConfiguration(AuthenticationManagerBuilder authenticationManagerBuilder, CustomizeAccessDecisionManager customizeAccessDecisionManager,
                                      InvocationSecurityMetadataSourceService invocationSecurityMetadataSourceService,
-                                     AlbedoProperties albedoProperties,
+                                     ApplicationProperties applicationProperties,
                                      UserDetailsService userDetailsService,
                                      TokenProvider tokenProvider, CorsFilter corsFilter) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.customizeAccessDecisionManager = customizeAccessDecisionManager;
         this.invocationSecurityMetadataSourceService = invocationSecurityMetadataSourceService;
-        this.albedoProperties = albedoProperties;
+        this.applicationProperties = applicationProperties;
         this.userDetailsService = userDetailsService;
         this.tokenProvider = tokenProvider;
         this.corsFilter = corsFilter;
@@ -104,27 +103,28 @@ public class SecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     @ConditionalOnMissingBean
     public AuthenticationEntryPoint authenticationEntryPoint(){
-        return new Http401UnauthorizedEntryPoint(albedoProperties);
+        return new Http401UnauthorizedEntryPoint(applicationProperties);
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        List<String> authorizes = albedoProperties.getSecurity().getAuthorizes();
-        authorizes.add(albedoProperties.getAdminPath("/**"));
+        List<String> authorizes = applicationProperties.getSecurity().getAuthorizes();
+        List<String> authorizeAdminPermitAll = applicationProperties.getSecurity().getAuthorizeAdminPermitAll();
+        authorizeAdminPermitAll.addAll(Lists.newArrayList(SecurityConstants.authorizePermitAll));
+        List<String> authorizePermitAll = applicationProperties.getSecurity().getAuthorizePermitAll();
+        authorizePermitAll.addAll(Lists.newArrayList(SecurityConstants.authorizeAdminPermitAll));
+        authorizes.add(applicationProperties.getAdminPath("/**"));
         authorizes.addAll(Lists.newArrayList(SecurityConstants.authorize));
         SecurityConstants.authorize = new String[authorizes.size()];
         authorizes.toArray(SecurityConstants.authorize);
-
-        String adminPath = albedoProperties.getAdminPath();
-
-        String[] permissAll = new String[SecurityConstants.authorizePermitAll.length+SecurityConstants.authorizeAdminPermitAll.length];
-
-        for (int i = 0; i < SecurityConstants.authorizePermitAll.length; i++) {
-            permissAll[i] = SecurityConstants.authorizePermitAll[i];
+        String adminPath = applicationProperties.getAdminPath();
+        String[] permissAll = new String[authorizeAdminPermitAll.size()+authorizePermitAll.size()];
+        for (int i = 0; i < authorizePermitAll.size(); i++) {
+            permissAll[i] = authorizePermitAll.get(i);
         }
-        for (int i = SecurityConstants.authorizePermitAll.length,j=0; i < permissAll.length; i++,j++) {
-            permissAll[i] = adminPath+SecurityConstants.authorizeAdminPermitAll[j];
+        for (int i = authorizePermitAll.size(),j=0; i < permissAll.length; i++,j++) {
+            permissAll[i] = adminPath+authorizeAdminPermitAll.get(j);
         }
 
         http.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
@@ -140,9 +140,9 @@ public class SecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeRequests()
-            .antMatchers(albedoProperties.getAdminPath(SecurityConstants.loginUrl)).permitAll()
-            .antMatchers(albedoProperties.getAdminPath(SecurityConstants.authLogin)).permitAll()
-            .antMatchers(albedoProperties.getAdminPath(SecurityConstants.logoutUrl)).permitAll()
+            .antMatchers(applicationProperties.getAdminPath(SecurityConstants.loginUrl)).permitAll()
+            .antMatchers(applicationProperties.getAdminPath(SecurityConstants.authLogin)).permitAll()
+            .antMatchers(applicationProperties.getAdminPath(SecurityConstants.logoutUrl)).permitAll()
             .antMatchers(permissAll).permitAll()
             .antMatchers(SecurityConstants.authorize).authenticated()
             .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
@@ -163,7 +163,7 @@ public class SecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     private JWTConfigurer securityConfigurerAdapter() {
-        return new JWTConfigurer(tokenProvider, albedoProperties);
+        return new JWTConfigurer(tokenProvider, applicationProperties);
     }
 
     @Bean
@@ -174,7 +174,7 @@ public class SecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
 
     public void afterPropertiesSet() {
         SecurityUtil.clearUserJedisCache();
-        JedisUtil.removeSys(GlobalJedis.RESOURCE_MODULE_DATA_MAP);
+        RedisUtil.removeSys(GlobalJedis.RESOURCE_MODULE_DATA_MAP);
         invocationSecurityMetadataSourceService.getResourceMap();
     }
 

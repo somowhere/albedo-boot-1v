@@ -3,6 +3,7 @@ package com.albedo.java.util.config;
 import com.albedo.java.util.PublicUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.Assert;
 
 import java.io.InputStream;
@@ -161,8 +162,8 @@ public class SystemConfig {
         if (props == null) {
             props = new java.util.Properties();
         }
-        SystemConfig sc = new SystemConfig();
-        InputStream is = sc.getClass().getResourceAsStream(PublicUtil.isEmpty(path) ? "/albedo.properties" : path);// properties
+        PathMatchingResourcePatternResolver resourceLoader = new PathMatchingResourcePatternResolver();
+        InputStream is = resourceLoader.getResources(PublicUtil.isEmpty(path) ? "/albedo.properties" : path)[0].getInputStream();
         // in
         // the
         // classpath

@@ -1,9 +1,8 @@
 package com.albedo.java.common.persistence.repository;
 
-import com.albedo.java.common.persistence.domain.BaseEntity;
 import com.albedo.java.common.persistence.domain.GeneralEntity;
-import com.albedo.java.util.domain.ComboSearch;
 import com.albedo.java.util.domain.ComboData;
+import com.albedo.java.util.domain.ComboSearch;
 import com.albedo.java.util.domain.PageModel;
 import com.albedo.java.util.domain.QueryCondition;
 import org.hibernate.Session;
@@ -15,11 +14,11 @@ import java.util.List;
 public interface JpaCustomeRepository<T extends GeneralEntity> {
 
     /* (非 Javadoc)
-    * <p>Title: getSession</p>
-    * <p>Description: </p>
-    * @return
-    * @see com.albedo.java.common.persistence.service.impl.IBaseUtilService#getSession()
-    */
+     * <p>Title: getSession</p>
+     * <p>Description: </p>
+     * @return
+     * @see com.albedo.java.common.persistence.service.impl.IBaseUtilService#getSession()
+     */
     Session getSession();
 
     /**
@@ -33,13 +32,14 @@ public interface JpaCustomeRepository<T extends GeneralEntity> {
     void clear();
 
     /* (非 Javadoc)
-    * <p>Title: clearLevel2Cache</p>
-    * <p>Description: </p>
-    * @see com.albedo.java.common.persistence.service.impl.IBaseUtilService#clearLevel2Cache()
-    */
+     * <p>Title: clearLevel2Cache</p>
+     * <p>Description: </p>
+     * @see com.albedo.java.common.persistence.service.impl.IBaseUtilService#clearLevel2Cache()
+     */
     Query createQuery(String HQL, Object... params);
 
     NativeQuery createSqlQuery(String SQL, Object... params);
+
     NativeQuery<T> createSqlQuery(String SQL, Class<T> clazz, Object... params);
 
     Object findByHQL(String HQL, boolean isList, List<QueryCondition> conditionList, Object... params);
@@ -84,13 +84,17 @@ public interface JpaCustomeRepository<T extends GeneralEntity> {
 
     List findListBySQL(String SQL, Object... params);
 
-    List findListBySQL(String SQL, Class<T> clazz, List<QueryCondition> conditionList, Object... params);
+    List<T> findListBySQL(String SQL, Class<T> clazz, List<QueryCondition> conditionList, Object... params);
 
-    List findListBySQL(String SQL, Class<T> clazz, Object... params);
+    List<T> findListBySQL(String SQL, Class<T> clazz, Object... params);
 
     Object findObjectBySQL(String SQL, List<QueryCondition> conditionList, Object... params);
 
+    T findEntityBySQL(String SQL, Class<T> clazz, Object... params);
+
     Object findObjectBySQL(String SQL, Object... params);
+
+    T findObjectBySQL(String SQL, Class<T> clazz, Object... params);
 
 
     Object findByQL(String QL, boolean isSql, boolean isCache, boolean isList, int maxSize, List<QueryCondition> conditionList, Object... params);

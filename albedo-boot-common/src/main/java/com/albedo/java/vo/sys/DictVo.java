@@ -20,7 +20,7 @@ public class DictVo extends TreeEntityVo {
     private String val;
     /*** 资源文件key */
     private String showName;
-    /*** key */
+    /*** T */
     private String key;
     private Integer isShow = 1;
     private String parentCode;

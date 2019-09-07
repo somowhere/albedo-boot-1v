@@ -1,6 +1,6 @@
 package com.albedo.java.common.config.template.tag;
 
-import com.albedo.java.common.config.AlbedoProperties;
+import com.albedo.java.common.config.ApplicationProperties;
 import com.albedo.java.util.PublicUtil;
 import com.albedo.java.util.StringUtil;
 import freemarker.core.Environment;
@@ -21,7 +21,7 @@ import java.util.Map;
 public class FileInputDirective implements TemplateDirectiveModel {
     private final Logger log = LoggerFactory.getLogger(FileInputDirective.class);
     @Autowired
-    AlbedoProperties albedoProperties;
+    ApplicationProperties applicationProperties;
 
     @Override
     public void execute(Environment environment, Map map, TemplateModel[] templateModels,
@@ -42,11 +42,11 @@ public class FileInputDirective implements TemplateDirectiveModel {
                     if (img.contains(StringUtil.SPLIT_DEFAULT)) {
                         String[] imgs = img.split(StringUtil.SPLIT_DEFAULT);
                         for (int i = 0; i < imgs.length; i++) {
-                            sb.append("<div class=\"fileinput-exists thumbnail fileinput-preview\"><img src=\"").append(albedoProperties.getStaticUrlPath(imgs[i])).append("\" alt=\"\" class=\"fileinput-img scale-img\" /></div>");
+                            sb.append("<div class=\"fileinput-exists thumbnail fileinput-preview\"><img src=\"").append(applicationProperties.getStaticUrlPath(imgs[i])).append("\" alt=\"\" class=\"fileinput-img scale-img\" /></div>");
                         }
                     } else {
                         sb.append("<div class=\"fileinput-exists thumbnail fileinput-preview\"><img src=\"").
-                                append(PublicUtil.isNotEmpty(value) ? albedoProperties.getStaticUrlPath(img) : img).append("\" class=\"fileinput-img scale-img\" /></div>");
+                                append(PublicUtil.isNotEmpty(value) ? applicationProperties.getStaticUrlPath(img) : img).append("\" class=\"fileinput-img scale-img\" /></div>");
                     }
                 sb.append("</div>");
             } else {
@@ -57,12 +57,12 @@ public class FileInputDirective implements TemplateDirectiveModel {
                     if (img.contains(StringUtil.SPLIT_DEFAULT)) {
                         String[] imgs = img.split(StringUtil.SPLIT_DEFAULT);
                         for (int i = 0; i < imgs.length; i++) {
-                            sb.append("<div class=\"fileinput-exists thumbnail fileinput-preview\"><img src=\"").append(albedoProperties.getStaticUrlPath(imgs[i])).append("\" alt=\"\" class=\"fileinput-img\" img-value=\"")
+                            sb.append("<div class=\"fileinput-exists thumbnail fileinput-preview\"><img src=\"").append(applicationProperties.getStaticUrlPath(imgs[i])).append("\" alt=\"\" class=\"fileinput-img\" img-value=\"")
                                     .append(imgs[i]).append("\" /></div>");
                         }
                     } else {
                         sb.append("<div class=\"fileinput-exists thumbnail fileinput-preview\"><img src=\"").
-                                append(PublicUtil.isNotEmpty(value) ? albedoProperties.getStaticUrlPath(img) : img).append("\" alt=\"\" class=\"fileinput-img\" img-value=\"")
+                                append(PublicUtil.isNotEmpty(value) ? applicationProperties.getStaticUrlPath(img) : img).append("\" alt=\"\" class=\"fileinput-img\" img-value=\"")
                                 .append(img).append("\" /></div>");
                     }
             }

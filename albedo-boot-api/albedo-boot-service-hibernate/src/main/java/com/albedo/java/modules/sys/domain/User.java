@@ -1,5 +1,6 @@
 package com.albedo.java.modules.sys.domain;
 
+import com.albedo.java.common.persistence.domain.DataUserEntity;
 import com.albedo.java.common.persistence.domain.IdEntity;
 import com.albedo.java.util.PublicUtil;
 import com.albedo.java.util.annotation.SearchField;
@@ -33,7 +34,8 @@ import java.util.Set;
 @DynamicInsert
 @DynamicUpdate
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class User extends IdEntity<String> {
+public class User extends DataUserEntity<String> {
+    public static final String F_PHONE = "phone";
     private static final long serialVersionUID = 1L;
     /*** F_LOGINID */
     public static final String F_LOGINID = "loginId";
@@ -46,8 +48,8 @@ public class User extends IdEntity<String> {
     @SearchField
     private String loginId;
 
-    @Column(name = "avatar_", length = 225)
-    private String avatar;
+//    @Column(name = "avatar_", length = 225)
+//    private String avatar;
 
     @JSONField(serialize = false)
     @NotBlank
@@ -104,7 +106,7 @@ public class User extends IdEntity<String> {
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id_")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id_")})
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @ApiModelProperty(hidden = true)
+    @ApiModelProperty(hidden = true) @JSONField(serialize = false)
     private Set<Role> roles = Sets.newHashSet();
 
     @JSONField(serialize = false)
@@ -274,12 +276,4 @@ public class User extends IdEntity<String> {
         return Collections3.convertToString(getRoleIdList(), ",");
     }
 
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
 }

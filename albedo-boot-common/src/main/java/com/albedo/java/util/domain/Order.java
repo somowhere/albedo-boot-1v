@@ -9,7 +9,7 @@ public class Order implements Serializable {
     /**
      * 默认方向
      */
-    private static final Order.Direction DEFAULT_DIRECTION = Order.Direction.desc;
+    private static final Direction DEFAULT_DIRECTION = Direction.desc;
     /**
      * 属性
      */
@@ -17,7 +17,7 @@ public class Order implements Serializable {
     /**
      * 方向
      */
-    private Order.Direction direction = DEFAULT_DIRECTION;
+    private Direction direction = DEFAULT_DIRECTION;
 
     /**
      * 构造方法
@@ -31,7 +31,7 @@ public class Order implements Serializable {
      * @param property  属性
      * @param direction 方向
      */
-    public Order(String property, Order.Direction direction) {
+    public Order(String property, Direction direction) {
         this.property = property;
         this.direction = direction;
     }
@@ -43,7 +43,7 @@ public class Order implements Serializable {
      * @return 递增排序
      */
     public static Order asc(String property) {
-        return new Order(property, Order.Direction.asc);
+        return new Order(property, Direction.asc);
     }
 
     /**
@@ -53,7 +53,7 @@ public class Order implements Serializable {
      * @return 递减排序
      */
     public static Order desc(String property) {
-        return new Order(property, Order.Direction.desc);
+        return new Order(property, Direction.desc);
     }
 
     @Override
@@ -84,7 +84,7 @@ public class Order implements Serializable {
      *
      * @return 方向
      */
-    public Order.Direction getDirection() {
+    public Direction getDirection() {
         return direction;
     }
 
@@ -93,7 +93,7 @@ public class Order implements Serializable {
      *
      * @param direction 方向
      */
-    public void setDirection(Order.Direction direction) {
+    public void setDirection(Direction direction) {
         this.direction = direction;
     }
 

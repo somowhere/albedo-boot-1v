@@ -14,5 +14,5 @@ public class TreeResult {
     private String value;
     private String key;
     private String iconCls;
-
+    private Boolean disabled = false;
 }

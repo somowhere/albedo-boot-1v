@@ -1,23 +1,18 @@
 package com.albedo.java.web.rest;
 
-import com.albedo.java.common.config.AlbedoProperties;
+import com.albedo.java.common.config.ApplicationProperties;
 import com.albedo.java.util.BeanValidators;
-import com.albedo.java.util.PublicUtil;
 import com.albedo.java.util.base.Collections3;
 import com.albedo.java.util.domain.CustomMessage;
 import com.albedo.java.util.domain.Globals;
 import com.albedo.java.util.exception.RuntimeMsgException;
-import com.albedo.java.web.rest.base.GeneralResource;
 import com.albedo.java.web.rest.errors.CustomParameterizedException;
-import com.albedo.java.web.rest.util.RequestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -26,7 +21,6 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.List;
@@ -38,7 +32,7 @@ import java.util.Set;
 @ControllerAdvice
 public class ExceptionTranslator {
     @Resource
-    protected AlbedoProperties albedoProperties;
+    protected ApplicationProperties applicationProperties;
     /**
      * 日志对象
      */

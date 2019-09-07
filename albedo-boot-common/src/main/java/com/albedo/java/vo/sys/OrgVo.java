@@ -15,8 +15,6 @@ public class OrgVo extends TreeEntityVo {
     ;
     public static final String F_CODE = "code";
     private String code;
-    /*** 拼音简码 */
-    private String en;
     /*** 机构类型（1：公司；2：部门；3：小组） */
     private String type;
     /*** 机构等级（1：一级；2：二级；3：三级；4：四级） */

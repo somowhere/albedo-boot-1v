@@ -27,7 +27,7 @@ import java.util.Properties;
 @Configuration
 @EnableScheduling
 @AutoConfigureAfter(value = {DataSourceAutoConfiguration.class})
-@ConditionalOnProperty(name = Globals.ALBEDO_QUARTZENABLED)
+@ConditionalOnProperty(name = Globals.APPLICATION_QUARTZENABLED)
 public class SchedulerConfiguration {
 
     public static JobDetailFactoryBean createJobDetail(Class jobClass) {

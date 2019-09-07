@@ -4,10 +4,10 @@
     <div class="filter-container">
       <el-form :inline="true">
         <el-form-item label="用户名">
-          <el-input class="filter-item input-normal" v-model="listQuery.loginId"></el-input>
+          <el-input class="filter-item input-normal" v-model="query.loginId"></el-input>
         </el-form-item>
         <el-form-item label="邮箱">
-          <el-input class="filter-item input-normal" v-model="listQuery.email"></el-input>
+          <el-input class="filter-item input-normal" v-model="query.email"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">查询</el-button>
@@ -61,7 +61,7 @@
 
       <el-table-column align="center" class-name="status-col" label="状态">
         <template slot-scope="scope">
-          <el-tag>{{scope.row.status}}</el-tag>
+          <el-tag>{{scope.row.statusText}}</el-tag>
         </template>
       </el-table-column>
 
@@ -128,13 +128,7 @@
         </el-form-item>
 
         <el-form-item label="角色" prop="roleIdList" :rules="[{required: true,message: '请选择角色' }]">
-          <el-select class="filter-item" v-model="form.roleIdList" placeholder="请选择" multiple>
-            <el-option v-for="item in rolesOptions" :key="item.id" :label="item.name"
-                       :value="item.id">
-              <span style="float: left">{{ item.name }}</span>
-              <!--<span style="float: right; color: #8492a6; font-size: 13px">{{ item.roleCode }}</span>-->
-            </el-option>
-          </el-select>
+          <AvueCrudSelect v-model="form.roleIdList" :multiple="true" :filterable="true" :dic="rolesOptions"></AvueCrudSelect>
         </el-form-item>
 
         <el-form-item label="状态" prop="status" :rules="[{required: true,message: '请选择状态' }]">
@@ -202,6 +196,7 @@ export default {
       list: null,
       total: null,
       listLoading: true,
+      query:{},
       listQuery: {
         page: 1,
         size: 20
@@ -266,7 +261,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['authorities'])
+    ...mapGetters(['authorities','dicts'])
   },
   filters: {
   },
@@ -278,18 +273,16 @@ export default {
     comboRoleList().then(response => {
       this.rolesOptions = response.data;
     });
-    dictCodes({codes:'sys_status'}).then(response => {
-      this.statusOptions = response.data[0];
-    });
+    this.statusOptions = this.dicts['sys_status'];
   },
   methods: {
     getList() {
       this.listLoading = true;
       this.listQuery.isAsc = false;
       this.listQuery.queryConditionJson = parseJsonItemForm([{
-        fieldName: 'loginId',value:this.listQuery.loginId
+        fieldName: 'loginId',value:this.query.loginId
       },{
-        fieldName: 'email',value:this.listQuery.email
+        fieldName: 'email',value:this.query.email
       }])
       pageUser(this.listQuery).then(response => {
         this.list = response.data;

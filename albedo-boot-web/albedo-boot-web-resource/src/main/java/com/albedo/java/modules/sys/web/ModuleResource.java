@@ -4,7 +4,7 @@ import com.albedo.java.common.persistence.domain.DataEntity;
 import com.albedo.java.common.security.AuthoritiesConstants;
 import com.albedo.java.common.security.SecurityUtil;
 import com.albedo.java.modules.sys.service.ModuleService;
-import com.albedo.java.util.JedisUtil;
+import com.albedo.java.util.RedisUtil;
 import com.albedo.java.util.JsonUtil;
 import com.albedo.java.util.PublicUtil;
 import com.albedo.java.util.StringUtil;
@@ -32,7 +32,7 @@ import javax.validation.Valid;
  * REST controller for managing Station.
  */
 @Controller
-@RequestMapping("${albedo.adminPath}/sys/module")
+@RequestMapping("${application.adminPath}/sys/module")
 public class ModuleResource extends TreeVoResource<ModuleService, ModuleVo> {
 
     public ModuleResource(ModuleService service) {
@@ -85,7 +85,7 @@ public class ModuleResource extends TreeVoResource<ModuleService, ModuleVo> {
         }
         service.save(moduleVo);
         SecurityUtil.clearUserJedisCache();
-        JedisUtil.removeSys(GlobalJedis.RESOURCE_MODULE_DATA_MAP);
+        RedisUtil.removeSys(GlobalJedis.RESOURCE_MODULE_DATA_MAP);
         return ResultBuilder.buildOk("保存", moduleVo.getName(), "成功");
     }
 
@@ -100,7 +100,7 @@ public class ModuleResource extends TreeVoResource<ModuleService, ModuleVo> {
         log.debug("REST request to delete Module: {}", ids);
         service.deleteByParentIds(Lists.newArrayList(ids.split(StringUtil.SPLIT_DEFAULT)), SecurityUtil.getCurrentUserId());
         SecurityUtil.clearUserJedisCache();
-        JedisUtil.removeSys(GlobalJedis.RESOURCE_MODULE_DATA_MAP);
+        RedisUtil.removeSys(GlobalJedis.RESOURCE_MODULE_DATA_MAP);
         return ResultBuilder.buildOk("删除成功");
     }
 
@@ -116,7 +116,7 @@ public class ModuleResource extends TreeVoResource<ModuleService, ModuleVo> {
         log.debug("REST request to lockOrUnLock Module: {}", ids);
         service.lockOrUnLockByParentIds(Lists.newArrayList(ids.split(StringUtil.SPLIT_DEFAULT)), SecurityUtil.getCurrentUserId());
         SecurityUtil.clearUserJedisCache();
-        JedisUtil.removeSys(GlobalJedis.RESOURCE_MODULE_DATA_MAP);
+        RedisUtil.removeSys(GlobalJedis.RESOURCE_MODULE_DATA_MAP);
         return ResultBuilder.buildOk("操作成功");
     }
 

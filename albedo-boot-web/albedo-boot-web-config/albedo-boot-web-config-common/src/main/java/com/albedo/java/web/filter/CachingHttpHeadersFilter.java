@@ -1,6 +1,6 @@
 package com.albedo.java.web.filter;
 
-import com.albedo.java.common.config.AlbedoProperties;
+import com.albedo.java.common.config.ApplicationProperties;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
@@ -18,15 +18,15 @@ public class CachingHttpHeadersFilter implements Filter {
 
     private long CACHE_TIME_TO_LIVE = TimeUnit.DAYS.toMillis(1461L);
 
-    private AlbedoProperties albedoProperties;
+    private ApplicationProperties applicationProperties;
 
-    public CachingHttpHeadersFilter(AlbedoProperties albedoProperties) {
-        this.albedoProperties = albedoProperties;
+    public CachingHttpHeadersFilter(ApplicationProperties applicationProperties) {
+        this.applicationProperties = applicationProperties;
     }
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        CACHE_TIME_TO_LIVE = TimeUnit.DAYS.toMillis(albedoProperties.getHttp().getCache().getTimeToLiveInDays());
+        CACHE_TIME_TO_LIVE = TimeUnit.DAYS.toMillis(applicationProperties.getHttp().getCache().getTimeToLiveInDays());
     }
 
     @Override

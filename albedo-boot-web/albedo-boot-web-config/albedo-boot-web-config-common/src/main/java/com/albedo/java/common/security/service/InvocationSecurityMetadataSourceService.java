@@ -1,13 +1,13 @@
 package com.albedo.java.common.security.service;
 
-import com.albedo.java.common.config.AlbedoProperties;
+import com.albedo.java.common.AuthoritiesConstants;
+import com.albedo.java.common.config.ApplicationProperties;
 import com.albedo.java.common.security.SecurityConstants;
-import com.albedo.java.common.security.annotaion.RequiresPermissions;
 import com.albedo.java.modules.sys.domain.Dict;
 import com.albedo.java.modules.sys.domain.Module;
 import com.albedo.java.modules.sys.service.ModuleService;
 import com.albedo.java.util.DictUtil;
-import com.albedo.java.util.JedisUtil;
+import com.albedo.java.util.RedisUtil;
 import com.albedo.java.util.PublicUtil;
 import com.albedo.java.util.StringUtil;
 import com.albedo.java.util.domain.GlobalJedis;
@@ -22,8 +22,6 @@ import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import javax.annotation.Resource;
@@ -40,7 +38,7 @@ public class InvocationSecurityMetadataSourceService
     @Resource
     ApplicationContext applicationContext;
     @Resource
-    AlbedoProperties albedoProperties;
+    ApplicationProperties applicationProperties;
     private Map<String, Collection<ConfigAttribute>> resourceMap = null;
     @Resource
     private ModuleService moduleService;
@@ -77,7 +75,7 @@ public class InvocationSecurityMetadataSourceService
     }
 
     public Map<String, Collection<ConfigAttribute>> getResourceMap() {
-        resourceMap = (Map<String, Collection<ConfigAttribute>>) JedisUtil.getSys(GlobalJedis.RESOURCE_MODULE_DATA_MAP);
+        resourceMap = (Map<String, Collection<ConfigAttribute>>) RedisUtil.getSys(GlobalJedis.RESOURCE_MODULE_DATA_MAP);
         if (resourceMap == null) {
             if (resourceMap == null) {
                 resourceMap = Maps.newHashMap();
@@ -97,7 +95,7 @@ public class InvocationSecurityMetadataSourceService
                                 (tempUrl.indexOf(StringUtil.SPLIT_DEFAULT) == -1 ? Lists.newArrayList(tempUrl) :
                                     Lists.newArrayList(tempUrl.split(StringUtil.SPLIT_DEFAULT))).forEach(url -> {
 
-                                    StringBuilder sb = new StringBuilder(!isAuthorizeUrlStart(url)? albedoProperties.getAdminPath():"").append(url).append(URL_SPILT);
+                                    StringBuilder sb = new StringBuilder(!isAuthorizeUrlStart(url)? applicationProperties.getAdminPath():"").append(url).append(URL_SPILT);
                                     if (PublicUtil.isEmpty(item.getRequestMethod())) {
                                         dictRequestList.forEach(dict -> keyList.add(PublicUtil.toAppendStr(sb.toString(), dict.getVal())));
                                     } else {
@@ -132,7 +130,7 @@ public class InvocationSecurityMetadataSourceService
 
                     }
                 });
-                JedisUtil.putSys(GlobalJedis.RESOURCE_MODULE_DATA_MAP, resourceMap);
+                RedisUtil.putSys(GlobalJedis.RESOURCE_MODULE_DATA_MAP, resourceMap);
             }
         }
 
@@ -159,7 +157,7 @@ public class InvocationSecurityMetadataSourceService
         while (ite.hasNext()) {
             url = ite.next();
             if (PublicUtil.isNotEmpty(url)) {
-                if (new AntPathRequestMatcher(PublicUtil.toAppendStr(contextPath, albedoProperties.getAdminPath(), url))
+                if (new AntPathRequestMatcher(PublicUtil.toAppendStr(contextPath, applicationProperties.getAdminPath(), url))
                     .matches(request)) {
                     SecurityConstants.setCurrentUrl(url);
                     return getResourceMap().get(PublicUtil.toAppendStr(url, "-", request.getMethod().toUpperCase()));
@@ -169,9 +167,9 @@ public class InvocationSecurityMetadataSourceService
         }
         String rqurl = request.getRequestURI();
 
-        if (new AntPathRequestMatcher(albedoProperties.getAdminPath(SecurityConstants.loginUrl)).matches(request)
-            || new AntPathRequestMatcher(albedoProperties.getAdminPath(SecurityConstants.authLogin)).matches(request)
-            || new AntPathRequestMatcher(albedoProperties.getAdminPath(SecurityConstants.logoutUrl)).matches(request)) {
+        if (new AntPathRequestMatcher(applicationProperties.getAdminPath(SecurityConstants.loginUrl)).matches(request)
+            || new AntPathRequestMatcher(applicationProperties.getAdminPath(SecurityConstants.authLogin)).matches(request)
+            || new AntPathRequestMatcher(applicationProperties.getAdminPath(SecurityConstants.logoutUrl)).matches(request)) {
             return null;
         }
 
@@ -181,13 +179,13 @@ public class InvocationSecurityMetadataSourceService
             }
         }
         for (int i = 0; i < SecurityConstants.authorizeAdminPermitAll.length; i++) {
-            if (new AntPathRequestMatcher(albedoProperties.getAdminPath(SecurityConstants.authorizeAdminPermitAll[i])).matches(request)) {
+            if (new AntPathRequestMatcher(applicationProperties.getAdminPath(SecurityConstants.authorizeAdminPermitAll[i])).matches(request)) {
                 return null;
             }
         }
 
-        if (rqurl.startsWith(contextPath+albedoProperties.getAdminPath())) {
-            return Lists.newArrayList(new SecurityConfig("user"));
+        if (rqurl.startsWith(contextPath+ applicationProperties.getAdminPath())) {
+            return Lists.newArrayList(new SecurityConfig(AuthoritiesConstants.USER));
         }
 
         return null;

@@ -2,7 +2,6 @@ package com.albedo.java.vo.base;
 
 import lombok.Data;
 
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 
 /**
@@ -12,7 +11,7 @@ import java.io.Serializable;
 public class DataEntityVo<PK extends Serializable> extends GeneralEntityVo {
 
     private PK id;
-    private Integer status = GeneralEntityVo.FLAG_NORMAL;
+    private Integer status = FLAG_NORMAL;
     private String description;
 
 }

@@ -1,6 +1,6 @@
 package com.albedo.java;
 
-import com.albedo.java.common.config.AlbedoProperties;
+import com.albedo.java.common.config.ApplicationProperties;
 import com.albedo.java.util.domain.Globals;
 import com.albedo.java.util.spring.DefaultProfileUtil;
 import org.slf4j.Logger;
@@ -23,7 +23,7 @@ import java.util.Collection;
  */
 
 @SpringBootApplication
-@EnableConfigurationProperties({AlbedoProperties.class})
+@EnableConfigurationProperties({ApplicationProperties.class})
 public class AlbedoBootWebApp {
 
     private static final Logger log = LoggerFactory.getLogger(AlbedoBootWebApp.class);

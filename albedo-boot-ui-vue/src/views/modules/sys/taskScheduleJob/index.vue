@@ -63,7 +63,7 @@
           <span>{{scope.row.methodParams}}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" fixed="right" label="操作" v-if="sys_taskScheduleJob_edit || sys_taskScheduleJob_delete">
+      <el-table-column align="center" fixed="right" label="操作" v-if="sys_taskScheduleJob_edit || sys_taskScheduleJob_lock || sys_taskScheduleJob_delete">
         <template slot-scope="scope">
           <el-button v-if="sys_taskScheduleJob_edit" icon="icon-edit" title="编辑" type="text" @click="handleEdit(scope.row)">
           </el-button>
@@ -129,12 +129,7 @@
 import { pageTaskScheduleJob, findTaskScheduleJob, saveTaskScheduleJob, lockTaskScheduleJob, removeTaskScheduleJob } from "./service";
 import { mapGetters } from "vuex";
 import {DATA_STATUS} from "@/const/common";
-import {
-  isValidateUnique,
-  objectToString, toStr,
-  validateNull
-} from "@/util/validate";
-import {dictCodes} from "@/api/dataSystem";
+import {isValidateUnique, isValidateNumber, isValidateDigits, objectToString, toStr, validateNull} from "@/util/validate";
 import {MSG_TYPE_SUCCESS} from "@/const/common";
 import {parseJsonItemForm} from "@/util/util";
 
@@ -165,8 +160,14 @@ export default {
         description: undefined,
       },
       validateUnique: (rule, value, callback) => {
-        isValidateUnique(rule, value, callback, '/sys/taskScheduleJob/checkByProperty?id='+toStr(this.form.id))
-      },
+          isValidateUnique(rule, value, callback, '/test/testTree/checkByProperty?id='+toStr(this.form.id))
+        },
+        validateNumber: (rule, value, callback) => {
+          isValidateNumber(rule, value, callback)
+        },
+        validateDigits: (rule, value, callback) => {
+          isValidateDigits(rule, value, callback)
+        },
       jobStatusOptions: undefined,
       isConcurrentOptions: undefined,
       statusOptions: undefined,
@@ -180,7 +181,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['authorities'])
+    ...mapGetters(["authorities","dicts"])
   },
   filters: {
   },
@@ -189,12 +190,9 @@ export default {
     this.sys_taskScheduleJob_edit = this.authorities.indexOf("sys_taskScheduleJob_edit") !== -1;
     this.sys_taskScheduleJob_lock = this.authorities.indexOf("sys_taskScheduleJob_lock") !== -1;
     this.sys_taskScheduleJob_delete = this.authorities.indexOf("sys_taskScheduleJob_delete") !== -1;
-
-    dictCodes({codes:'sys_yes_no,sys_yes_no,sys_status,'}).then(response => {
-      this.jobStatusOptions = response.data[0];
-      this.isConcurrentOptions = response.data[1];
-      this.statusOptions = response.data[2];
-    });
+    this.jobStatusOptions = this.dicts["sys_yes_no"];
+    this.isConcurrentOptions = this.dicts["sys_yes_no"];
+    this.statusOptions = this.dicts["sys_status"];
   },
   methods: {
     getList() {
@@ -230,7 +228,6 @@ export default {
         findTaskScheduleJob(row.id).then(response => {
           this.form = response.data;
           this.form.status=objectToString(this.form.status)
-          this.form.isConcurrent=objectToString(this.form.isConcurrent)
           this.dialogFormVisible = true;
         });
       }

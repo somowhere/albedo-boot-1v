@@ -388,47 +388,57 @@ public class JpaCustomeRepositoryImpl<T extends GeneralEntity> implements JpaCus
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public List findListSizeBySQL(String SQL, int maxSize, List<QueryCondition> conditionList, Object... params) {
-        return (List) findBySQL(SQL, true, false, maxSize, null, conditionList, params);
+        return (List) findBySQL(SQL, true, true, maxSize, null, conditionList, params);
     }
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public List findListSizeBySQL(String SQL, int maxSize, Object... params) {
-        return (List) findBySQL(SQL, true, false, maxSize, null, null, params);
+        return (List) findBySQL(SQL, true, true, maxSize, null, null, params);
     }
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public List findListBySQL(String SQL, List<QueryCondition> conditionList, Object... params) {
-        return (List) findBySQL(SQL, true, false, 0, null, conditionList, params);
+        return (List) findBySQL(SQL, true, true, 0, null, conditionList, params);
     }
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public List findListBySQL(String SQL, Object... params) {
-        return (List) findBySQL(SQL, true, false, 0, null, null, params);
+        return (List) findBySQL(SQL, true, true, 0, null, null, params);
     }
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
-    public List findListBySQL(String SQL, Class<T> clazz, List<QueryCondition> conditionList, Object... params) {
-        return (List) findBySQL(SQL, true, false, 0, clazz, conditionList, params);
+    public List<T> findListBySQL(String SQL, Class<T> clazz, List<QueryCondition> conditionList, Object... params) {
+        return (List) findBySQL(SQL, true, true, 0, clazz, conditionList, params);
     }
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
-    public List findListBySQL(String SQL, Class<T> clazz, Object... params) {
-        return (List) findBySQL(SQL, true, false, 0, clazz, null, params);
+    public List<T> findListBySQL(String SQL, Class<T> clazz, Object... params) {
+        return (List) findBySQL(SQL, true, true, 0, clazz, null, params);
     }
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public Object findObjectBySQL(String SQL, List<QueryCondition> conditionList, Object... params) {
         return findBySQL(SQL, true, false, 0, null, conditionList, params);
     }
+    @Override
+    @Transactional(readOnly = true, rollbackFor = Exception.class)
+    public T findEntityBySQL(String SQL, Class<T> clazz, Object... params) {
+        return (T) findBySQL(SQL, true, false, 0, clazz, null, params);
+    }
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public Object findObjectBySQL(String SQL, Object... params) {
         return findBySQL(SQL, true, false, 0, null, null, params);
+    }
+
+    @Override
+    public T findObjectBySQL(String SQL, Class<T> clazz, Object... params) {
+        return (T) findBySQL(SQL, true, false, 0, clazz, null, params);
     }
 
     public Object findBySQL(String SQL, boolean isCache, boolean isList, int maxSize, Class<T> clazz,

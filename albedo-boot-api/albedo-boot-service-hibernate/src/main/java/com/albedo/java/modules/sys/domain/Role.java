@@ -1,5 +1,6 @@
 package com.albedo.java.modules.sys.domain;
 
+import com.albedo.java.common.persistence.domain.DataUserEntity;
 import com.albedo.java.common.persistence.domain.IdEntity;
 import com.albedo.java.util.PublicUtil;
 import com.albedo.java.util.annotation.DictType;
@@ -9,6 +10,8 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.Getter;
 import lombok.ToString;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.*;
@@ -29,7 +32,8 @@ import java.util.Set;
 @DynamicUpdate
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @ToString
-public class Role extends IdEntity<String> {
+@Data
+public class Role extends DataUserEntity<String> {
 
     public static final String F_SORT = "sort";
     public static final String F_NAME = "name";
@@ -87,7 +91,7 @@ public class Role extends IdEntity<String> {
 
     /*** 拥有用户列表 */
     @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
-    @Where(clause = "status_ = 0")
+    @Where(clause = "status_ = 1")
     @OrderBy("created_date")
     @Fetch(FetchMode.SUBSELECT)
     @JSONField(serialize = false)
@@ -120,81 +124,6 @@ public class Role extends IdEntity<String> {
     public Role(String id, String name) {
         this.setId(id);
         this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-
-    public Integer getSysData() {
-        return sysData;
-    }
-
-    public void setSysData(Integer sysData) {
-        this.sysData = sysData;
-    }
-
-    public Integer getDataScope() {
-        return dataScope;
-    }
-
-    public void setDataScope(Integer dataScope) {
-        this.dataScope = dataScope;
-    }
-
-
-    public Set<Module> getModules() {
-        return modules;
-    }
-
-    public void setModules(Set<Module> modules) {
-        this.modules = modules;
-    }
-
-    public Integer getSort() {
-        return sort;
-    }
-
-    public void setSort(Integer sort) {
-        this.sort = sort;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getEn() {
-        return en;
-    }
-
-    public void setEn(String en) {
-        this.en = en;
-    }
-
-
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
-    }
-
-    public Set<Org> getOrgs() {
-        return orgs;
-    }
-
-    public void setOrgs(Set<Org> orgs) {
-        this.orgs = orgs;
     }
 
 
@@ -249,22 +178,5 @@ public class Role extends IdEntity<String> {
     public String getModuleIds() {
         return Collections3.convertToString(getModuleIdList(), ",");
     }
-
-    public String getOrgId() {
-        return orgId;
-    }
-
-    public void setOrgId(String orgId) {
-        this.orgId = orgId;
-    }
-
-    public Org getOrg() {
-        return org;
-    }
-
-    public void setOrg(Org org) {
-        this.org = org;
-    }
-
 
 }

@@ -1,6 +1,6 @@
 package com.albedo.java.web.interceptor;
 
-import com.albedo.java.common.config.AlbedoProperties;
+import com.albedo.java.common.config.ApplicationProperties;
 import com.albedo.java.util.DateUtil;
 import com.albedo.java.util.PublicUtil;
 import com.albedo.java.util.StringUtil;
@@ -37,10 +37,11 @@ public class OperateInterceptor implements HandlerInterceptor {
     private boolean isTokenInterceptor;
     private String freeURL;
 
-    public OperateInterceptor(AlbedoProperties albedoProperties) {
-        isTokenInterceptor = albedoProperties.getIsTokenInterceptor();
-        freeURL = albedoProperties.getFreeURL();
+    public OperateInterceptor(ApplicationProperties applicationProperties) {
+        isTokenInterceptor = applicationProperties.getIsTokenInterceptor();
+        freeURL = applicationProperties.getFreeURL();
     }
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         boolean flag = false;
@@ -84,8 +85,8 @@ public class OperateInterceptor implements HandlerInterceptor {
                 } catch (IllegalStateException e) {
                     flag = false;
                     msg = PublicUtil.toAppendStr(
-                            "{\"_success\" : false,\"_operationMsg\" : \"Error creating HttpSession due response is commited to client. You can use the CreateSessionInterceptor or create the HttpSession from your action before the result is rendered to the client: ",
-                            e.getMessage(), "\"}");
+                        "{\"_success\" : false,\"_operationMsg\" : \"Error creating HttpSession due response is commited to client. You can use the CreateSessionInterceptor or create the HttpSession from your action before the result is rendered to the client: ",
+                        e.getMessage(), "\"}");
                     e.printStackTrace();
                 }
                 if (!flag) {
@@ -134,6 +135,7 @@ public class OperateInterceptor implements HandlerInterceptor {
         path.append(url).append("'</script>").toString();
         response.getWriter().println(path.toString());
     }
+
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         // if (modelAndView != null) {
@@ -153,18 +155,23 @@ public class OperateInterceptor implements HandlerInterceptor {
 //		LogUtil.saveLog(request, handler, ex, endTime - beginTime, null);
         // 打印JVM信息。
         Map<String, Object> params = Maps.newHashMap();
-        if(request instanceof CustomHttpServletRequestWrapper) {
+        if (request instanceof CustomHttpServletRequestWrapper) {
             String body = ((CustomHttpServletRequestWrapper) request).getRequestBody();
             logger.info("request body:{} url:{} method:{}", body, request.getRequestURI(), request.getMethod());
             if (PublicUtil.isNotEmpty(body)) {
-                try {
-                    params = JSON.parseObject(body);
-                } catch (Exception e) {
-                    logger.warn("{}", e);
+                if (body.startsWith("<xml>")) {
+                    params.put("result:", params);
+                } else {
+                    try {
+                        params = JSON.parseObject(body);
+                    } catch (Exception e) {
+                        logger.warn("{}", e);
+                    }
                 }
+
             }
         }
-        if(PublicUtil.isEmpty(params)){
+        if (PublicUtil.isEmpty(params)) {
             Enumeration<String> keys = request.getParameterNames();
             String key;
             while (keys.hasMoreElements()) {

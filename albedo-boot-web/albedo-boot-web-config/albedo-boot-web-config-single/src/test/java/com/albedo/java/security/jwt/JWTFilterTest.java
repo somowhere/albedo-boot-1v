@@ -1,6 +1,6 @@
 package com.albedo.java.security.jwt;
 
-import com.albedo.java.common.config.AlbedoProperties;
+import com.albedo.java.common.config.ApplicationProperties;
 import com.albedo.java.common.security.AuthoritiesConstants;
 import com.albedo.java.common.security.SecurityConstants;
 import com.albedo.java.common.security.jwt.JWTFilter;
@@ -26,15 +26,15 @@ public class JWTFilterTest {
     private TokenProvider tokenProvider;
 
     private JWTFilter jwtFilter;
-    AlbedoProperties albedoProperties;
+    ApplicationProperties applicationProperties;
     @Before
     public void setup() {
-        AlbedoProperties albedoProperties = new AlbedoProperties();
-//        albedoProperties.getHttp().setRestful(true);
-        tokenProvider = new TokenProvider(albedoProperties);
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+//        ApplicationProperties.getHttp().setRestful(true);
+        tokenProvider = new TokenProvider(applicationProperties);
         ReflectionTestUtils.setField(tokenProvider, "secretKey", "test secret");
         ReflectionTestUtils.setField(tokenProvider, "tokenValidityInMilliseconds", 60000);
-        jwtFilter = new JWTFilter(tokenProvider, albedoProperties);
+        jwtFilter = new JWTFilter(tokenProvider, applicationProperties);
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 

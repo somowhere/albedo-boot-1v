@@ -9,7 +9,7 @@
  */
 package ${packageName}.${moduleName}.web<#if subModuleName != "">.${subModuleName}</#if>;
 
-import com.albedo.java.common.config.AlbedoProperties;
+import com.albedo.java.common.config.ApplicationProperties;
 import com.albedo.java.common.persistence.DynamicSpecifications;
 import com.albedo.java.common.persistence.SpecificationDetail;
 import com.albedo.java.common.persistence.domain.BaseEntity;
@@ -113,7 +113,7 @@ public class ${ClassName}ResourceIntTest {
     private EntityManager em;
 
     @Autowired
-    private AlbedoProperties albedoProperties;
+    private ApplicationProperties ApplicationProperties;
 
     private MockMvc rest${ClassName}MockMvc;
 
@@ -121,11 +121,11 @@ public class ${ClassName}ResourceIntTest {
 
     @Before
     public void setup() {
-        DEFAULT_API_URL = albedoProperties.getAdminPath("/${urlPrefix}/");
+        DEFAULT_API_URL = ApplicationProperties.getAdminPath("/${urlPrefix}/");
         MockitoAnnotations.initMocks(this);
         final ${ClassName}Resource ${className}Resource = new ${ClassName}Resource(${className}Service);
         this.rest${ClassName}MockMvc = MockMvcBuilders.standaloneSetup(${className}Resource)
-            .addPlaceholderValue("albedo.adminPath", albedoProperties.getAdminPath())
+            .addPlaceholderValue("application.adminPath", ApplicationProperties.getAdminPath())
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
             .setMessageConverters(jacksonMessageConverter)

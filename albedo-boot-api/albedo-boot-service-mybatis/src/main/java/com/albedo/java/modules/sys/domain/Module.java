@@ -5,8 +5,8 @@ import com.albedo.java.util.StringUtil;
 import com.albedo.java.util.annotation.DictType;
 import com.albedo.java.util.annotation.SearchField;
 import com.albedo.java.util.domain.RequestMethod;
-import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -45,6 +45,8 @@ public class Module extends TreeEntity<Module> {
     /*** 链接地址 */
     @TableField("url_")
     private String url;
+    @TableField("component_")
+    private String component;
     /*** 图标class */
     @TableField("icon_cls")
     private String iconCls;

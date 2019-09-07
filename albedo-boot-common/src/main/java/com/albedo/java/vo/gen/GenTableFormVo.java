@@ -6,15 +6,11 @@ import com.albedo.java.util.base.Collections3;
 import com.albedo.java.util.config.SystemConfig;
 import com.albedo.java.util.exception.RuntimeMsgException;
 import com.albedo.java.vo.base.DataEntityVo;
-import com.alibaba.fastjson.annotation.JSONField;
-import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * 业务表Entity

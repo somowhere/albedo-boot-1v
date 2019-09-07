@@ -23,16 +23,16 @@ public class AsyncConfiguration implements AsyncConfigurer {
     private final Logger log = LoggerFactory.getLogger(AsyncConfiguration.class);
 
     @Resource
-    private AlbedoProperties albedoProperties;
+    private ApplicationProperties applicationProperties;
 
     @Override
     @Bean(name = "taskExecutor")
     public Executor getAsyncExecutor() {
         log.debug("Creating Async Task Executor");
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(albedoProperties.getAsync().getCorePoolSize());
-        executor.setMaxPoolSize(albedoProperties.getAsync().getMaxPoolSize());
-        executor.setQueueCapacity(albedoProperties.getAsync().getQueueCapacity());
+        executor.setCorePoolSize(applicationProperties.getAsync().getCorePoolSize());
+        executor.setMaxPoolSize(applicationProperties.getAsync().getMaxPoolSize());
+        executor.setQueueCapacity(applicationProperties.getAsync().getQueueCapacity());
         executor.setThreadNamePrefix("albedo-albedo-Executor-");
         return new ExceptionHandlingAsyncTaskExecutor(executor);
     }

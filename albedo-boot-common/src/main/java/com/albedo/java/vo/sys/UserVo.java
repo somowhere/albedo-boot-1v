@@ -1,14 +1,15 @@
 package com.albedo.java.vo.sys;
 
-import com.albedo.java.util.base.Collections3;
+import com.albedo.java.util.StringUtil;
+import com.albedo.java.util.annotation.DictType;
 import com.albedo.java.vo.base.DataEntityVo;
+import com.albedo.java.util.base.Collections3;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.validation.constraints.Size;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
@@ -35,6 +36,7 @@ public class UserVo extends DataEntityVo<String> {
     /*** F_LOGINID */
     public static final String F_EMAIL = "email";
     public static final String F_PHONE = "phone";
+    public static final String F_TYPE = "type";
     private static final long serialVersionUID = 1L;
     /*** 头像 */
     private String avatar;
@@ -49,23 +51,18 @@ public class UserVo extends DataEntityVo<String> {
 
     private String email;
 
-    private boolean activated = false;
-
-    private String langKey;
-
-    private String activationKey;
-
-    private String resetKey;
-    private ZonedDateTime resetDate = null;
-
     private List<String> roleIdList;
     private String roleNames;
     private String orgName;
 
     private List<String> authorities;
 
-    public String getRoleIds() {
-        return Collections3.convertToString(getRoleIdList(), ",");
-    }
+
+    @DictType(name= "sys_user_type")
+    private String type;
+
+//    public String getRoleIds() {
+//        return Collections3.convertToString(getRoleIdList(), StringUtil.SPLIT_DEFAULT);
+//    }
 
 }

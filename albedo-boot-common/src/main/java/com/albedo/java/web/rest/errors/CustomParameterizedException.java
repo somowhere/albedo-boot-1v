@@ -1,6 +1,7 @@
 package com.albedo.java.web.rest.errors;
 
 import com.albedo.java.util.domain.Parameter;
+import com.albedo.java.util.domain.Parameter;
 
 import java.util.Map;
 /**

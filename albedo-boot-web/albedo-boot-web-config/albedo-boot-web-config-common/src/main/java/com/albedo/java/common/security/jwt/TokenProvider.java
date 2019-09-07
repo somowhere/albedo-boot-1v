@@ -1,6 +1,7 @@
 package com.albedo.java.common.security.jwt;
 
-import com.albedo.java.common.config.AlbedoProperties;
+import com.albedo.java.common.config.ApplicationProperties;
+import com.albedo.java.util.StringUtil;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,41 +31,41 @@ public class TokenProvider {
 
     private long tokenValidityInMillisecondsForRememberMe;
 
-    private final AlbedoProperties albedoProperties;
+    private final ApplicationProperties applicationProperties;
 
-    public TokenProvider(AlbedoProperties albedoProperties) {
-        this.albedoProperties = albedoProperties;
+    public TokenProvider(ApplicationProperties applicationProperties) {
+        this.applicationProperties = applicationProperties;
     }
 
     @PostConstruct
     public void init() {
         this.secretKey =
-                albedoProperties.getSecurity().getAuthentication().getJwt().getSecret();
+            applicationProperties.getSecurity().getAuthentication().getJwt().getSecret();
 
         this.tokenValidityInMilliseconds =
-            1000 * albedoProperties.getSecurity().getAuthentication().getJwt().getTokenValidityInSeconds();
+            1000 * applicationProperties.getSecurity().getAuthentication().getJwt().getTokenValidityInSeconds();
         this.tokenValidityInMillisecondsForRememberMe =
-            1000 * albedoProperties.getSecurity().getAuthentication().getJwt().getTokenValidityInSecondsForRememberMe();
+            1000 * applicationProperties.getSecurity().getAuthentication().getJwt().getTokenValidityInSecondsForRememberMe();
     }
 
     public String createToken(Authentication authentication, Boolean rememberMe) {
         String authorities = authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
-            .collect(Collectors.joining(","));
+            .collect(Collectors.joining(StringUtil.SPLIT_DEFAULT));
 
         long now = (new Date()).getTime();
-        Date validity;
-        if (rememberMe) {
-            validity = new Date(now + this.tokenValidityInMillisecondsForRememberMe);
-        } else {
-            validity = new Date(now + this.tokenValidityInMilliseconds);
-        }
+//        Date validity;
+//        if (rememberMe) {
+//            validity = new Date(now + this.tokenValidityInMillisecondsForRememberMe);
+//        } else {
+//            validity = new Date(now + this.tokenValidityInMilliseconds);
+//        }
 
         return Jwts.builder()
             .setSubject(authentication.getName())
             .claim(AUTHORITIES_KEY, authorities)
             .signWith(SignatureAlgorithm.HS512, secretKey)
-            .setExpiration(validity)
+//            .setExpiration(validity)
             .compact();
     }
 
@@ -75,7 +76,7 @@ public class TokenProvider {
             .getBody();
 
         Collection<? extends GrantedAuthority> authorities =
-            Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+            Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(StringUtil.SPLIT_DEFAULT))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
@@ -106,4 +107,9 @@ public class TokenProvider {
         }
         return false;
     }
+
+    public long getTokenValidityInSeconds() {
+        return applicationProperties.getSecurity().getAuthentication().getJwt().getTokenValidityInSeconds();
+    }
+
 }

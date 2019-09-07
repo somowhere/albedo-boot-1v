@@ -41,7 +41,7 @@ public class GenTemplateVo {
         if (category == null) {
             return Lists.newArrayList();
         } else {
-            return Lists.newArrayList(StringUtil.split(category, ","));
+            return Lists.newArrayList(StringUtil.split(category, StringUtil.SPLIT_DEFAULT));
         }
     }
 
@@ -49,7 +49,7 @@ public class GenTemplateVo {
         if (categoryList == null) {
             this.category = "";
         } else {
-            this.category = "," + StringUtil.join(categoryList, ",") + ",";
+            this.category = StringUtil.SPLIT_DEFAULT + StringUtil.join(categoryList, StringUtil.SPLIT_DEFAULT) + StringUtil.SPLIT_DEFAULT;
         }
     }
 }

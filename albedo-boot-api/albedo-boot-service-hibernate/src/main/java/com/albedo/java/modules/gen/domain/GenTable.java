@@ -1,6 +1,7 @@
 package com.albedo.java.modules.gen.domain;
 
 import com.albedo.java.common.persistence.domain.DataEntity;
+import com.albedo.java.common.persistence.domain.DataUserEntity;
 import com.albedo.java.common.persistence.domain.IdEntity;
 import com.albedo.java.util.PublicUtil;
 import com.albedo.java.util.StringUtil;
@@ -9,6 +10,7 @@ import com.albedo.java.util.base.Collections3;
 import com.albedo.java.util.config.SystemConfig;
 import com.albedo.java.util.exception.RuntimeMsgException;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.*;
@@ -31,7 +33,7 @@ import java.util.List;
 @DynamicInsert
 @DynamicUpdate
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class GenTable extends IdEntity<String> {
+public class GenTable extends DataUserEntity<String> {
 
     public static final String F_NAME = "name";
     public static final String F_NAMESANDTITLE = "nameAndTitle";
@@ -50,19 +52,21 @@ public class GenTable extends IdEntity<String> {
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinColumn(name = "gen_table_id")
-    @Where(clause = "status_ = 0")
+    @Where(clause = "status_ = 1")
     @OrderBy("sort_")
     @Fetch(FetchMode.SUBSELECT)
     @JSONField(serialize = false)
+    @JsonIgnore
     private List<GenTableColumn> columnList; // 表列
 
     @ManyToOne(targetEntity = GenTable.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_table", referencedColumnName = "name_", nullable = true, insertable = false, updatable = false)
     @NotFound(action = NotFoundAction.IGNORE)
     @JSONField(serialize = false)
+    @JsonIgnore
     private GenTable parent; // 父表对象
 //    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY, mappedBy = "parent", targetEntity = GenTable.class)
-//    @Where(clause = "status_ = 0")
+//    @Where(clause = "status_ = 1")
 //    @Fetch(FetchMode.SUBSELECT)
 //    @JSONField(serialize = false)
 //    private List<GenTable> childList = Lists.newArrayList(); // 子表列表
@@ -73,14 +77,17 @@ public class GenTable extends IdEntity<String> {
     private String nameLike; // 按名称模糊查询
     @Transient
     @JSONField(serialize = false)
+    @JsonIgnore
     private List<String> pkList; // 当前表主键列表
     @Transient
     @JSONField(serialize = false)
+    @JsonIgnore
     private List<GenTableColumn> pkColumnList; // 当前表主键列表
     @Transient
     private String category; // 当前表的生成分类
     @Transient
     @JSONField(serialize = false)
+    @JsonIgnore
     private List<GenTableColumn> columnFormList;
 
     public GenTable() {
@@ -468,6 +475,7 @@ public class GenTable extends IdEntity<String> {
      *
      * @return
      */
+    @JsonIgnore
     public GenTableColumn getPkColumn() {
         if (isNotCompositeId()) {
             for (GenTableColumn column : getColumnList()) {

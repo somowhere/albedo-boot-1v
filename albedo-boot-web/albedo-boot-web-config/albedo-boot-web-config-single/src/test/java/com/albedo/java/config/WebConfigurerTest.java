@@ -1,6 +1,6 @@
 //package com.albedo.java.config;
 //
-//import com.albedo.java.common.config.AlbedoProperties;
+//import com.albedo.java.common.config.ApplicationProperties;
 //import com.albedo.java.common.config.WebConfigurer;
 //import com.albedo.java.util.domain.Globals;
 //import com.albedo.java.web.filter.CachingHttpHeadersFilter;
@@ -48,7 +48,7 @@
 //
 //    private MockEnvironment env;
 //
-//    private AlbedoProperties props;
+//    private ApplicationProperties props;
 //
 //    private MetricRegistry metricRegistry;
 //
@@ -61,7 +61,7 @@
 //            .when(servletContext).addServlet(anyString(), any(Servlet.class));
 //
 //        env = new MockEnvironment();
-//        props = new AlbedoProperties();
+//        props = new ApplicationProperties();
 //        props.setAdminPath("/api");
 //        webConfigurer = new WebConfigurer(env, props);
 //        metricRegistry = new MetricRegistry();
@@ -114,7 +114,7 @@
 //
 //    @Test
 //    public void testUndertowHttp2Enabled() {
-//        props.getHttp().setVersion(AlbedoProperties.Http.Version.V_2_0);
+//        props.getHttp().setVersion(ApplicationProperties.Http.Version.V_2_0);
 //        UndertowEmbeddedServletContainerFactory container = new UndertowEmbeddedServletContainerFactory();
 //        webConfigurer.customize(container);
 //        Builder builder = Undertow.builder();

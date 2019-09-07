@@ -1,11 +1,13 @@
 package com.albedo.java.util;
 
-import com.albedo.java.common.config.AlbedoProperties;
+import com.albedo.java.common.config.ApplicationProperties;
 import com.albedo.java.modules.sys.domain.Dict;
 import com.albedo.java.modules.sys.repository.DictRepository;
+import com.albedo.java.modules.sys.service.DictService;
 import com.albedo.java.util.config.SystemConfig;
 import com.albedo.java.util.domain.DictVm;
 import com.albedo.java.util.spring.SpringContextHolder;
+import com.albedo.java.vo.base.SelectResult;
 import com.albedo.java.vo.sys.query.DictQuery;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
@@ -23,11 +25,11 @@ import java.util.Map;
 public class DictUtil {
     public static final String CACHE_DICT_MAP = "dictMap";
     public static final String CACHE_DICT_LIST = "dictList";
-    public static AlbedoProperties albedoProperties = SpringContextHolder.getBean(AlbedoProperties.class);
-    public static DictRepository dictService = SpringContextHolder.getBean(DictRepository.class);
+    public static ApplicationProperties ApplicationProperties = SpringContextHolder.getBean(ApplicationProperties.class);
+    public static DictService dictService = SpringContextHolder.getBean(DictService.class);
     private static Map<String, String> dataMap = Maps.newHashMap();
 
-    private static boolean cluster = albedoProperties.getCluster();
+    private static boolean cluster = ApplicationProperties.getCluster();
 
     /**
      * 清空ehcache中所有字典对象
@@ -37,8 +39,8 @@ public class DictUtil {
             dataMap.remove(CACHE_DICT_MAP);
             dataMap.remove(CACHE_DICT_LIST);
         }
-        JedisUtil.removeUser(CACHE_DICT_LIST);
-        JedisUtil.removeUser(CACHE_DICT_MAP);
+        RedisUtil.removeUser(CACHE_DICT_LIST);
+        RedisUtil.removeUser(CACHE_DICT_MAP);
     }
 
     /**
@@ -48,17 +50,17 @@ public class DictUtil {
         String dictListJson = null;
         List<Dict> dictList = null;
         if (cluster) {
-            dictListJson = JedisUtil.getUserStr(CACHE_DICT_LIST);
+            dictListJson = RedisUtil.getUserStr(CACHE_DICT_LIST);
         } else {
             dictListJson = dataMap.get(CACHE_DICT_LIST);
             if (PublicUtil.isEmpty(dictListJson))
-                dictListJson = JedisUtil.getUserStr(CACHE_DICT_LIST);
+                dictListJson = RedisUtil.getUserStr(CACHE_DICT_LIST);
         }
 
         if (PublicUtil.isEmpty(dictListJson)) {
             dictList = dictService.findAllByStatusNotAndIsShowOrderBySortAsc(Dict.FLAG_DELETE, SystemConfig.YES);
             dictListJson = Json.toJSONString(dictList, Dict.F_PARENT, Dict.F_CREATOR, Dict.F_MODIFIER);
-            JedisUtil.putUser(CACHE_DICT_LIST, dictListJson);
+            RedisUtil.putUser(CACHE_DICT_LIST, dictListJson);
         }
 
         if (!cluster && PublicUtil.isNotEmpty(dictListJson)) {
@@ -78,11 +80,11 @@ public class DictUtil {
         Map<String, List<Dict>> dictMap = Maps.newHashMap();
         String dictMapJson = null;
         if (cluster) {
-            dictMapJson = JedisUtil.getUserStr(CACHE_DICT_MAP);
+            dictMapJson = RedisUtil.getUserStr(CACHE_DICT_MAP);
         } else {
             dictMapJson = dataMap.get(CACHE_DICT_MAP);
             if (PublicUtil.isEmpty(dictMapJson))
-                dictMapJson = JedisUtil.getUserStr(CACHE_DICT_MAP);
+                dictMapJson = RedisUtil.getUserStr(CACHE_DICT_MAP);
         }
         if (PublicUtil.isEmpty(dictMapJson) || dictMapJson.equals("{}")) {
             String parentCode = null;
@@ -99,7 +101,7 @@ public class DictUtil {
                 }
             }
             dictMapJson = Json.toJSONString(dictMap, Dict.F_PARENT, Dict.F_CREATOR, Dict.F_MODIFIER);
-            JedisUtil.putUser(CACHE_DICT_MAP, dictMapJson);
+            RedisUtil.putUser(CACHE_DICT_MAP, dictMapJson);
         }
 
         if (!cluster && PublicUtil.isNotEmpty(dictMapJson)) {
@@ -136,7 +138,8 @@ public class DictUtil {
     /**
      * 根据code 和 原始值 获取数据字典name
      *
-     * @param types
+     * @param code
+     * @param values
      * @return
      */
     public static String getNamesByValues(String code, String values) {
@@ -157,7 +160,7 @@ public class DictUtil {
      * 根据code 和 name 获取数据字典原始值 下级
      *
      * @param code
-     * @param val
+     * @param name
      * @return
      */
     public static String getValByName(String code, String name) {
@@ -412,4 +415,7 @@ public class DictUtil {
         return rsList;
     }
 
+    public static Map<String,List<SelectResult>> getCodeList(List<String> kindIds) {
+        return dictService.findCodeList(kindIds);
+    }
 }

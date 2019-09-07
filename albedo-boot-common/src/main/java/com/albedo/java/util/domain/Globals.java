@@ -1,17 +1,12 @@
 package com.albedo.java.util.domain;
 
-import com.google.common.collect.Maps;
-
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Application constants.
  */
 public final class Globals {
 
     //Regex for acceptable logins
-    public static final String LOGIN_REGEX = "^[_'.@A-Za-z0-9-]*$";
+    public static final String LOGIN_REGEX = "^[_',.@A-Za-z0-9-]*$";
     // Spring profile for development and production, see http://albedo.github.io/profiles/
     public static final String SPRING_PROFILE_DEVELOPMENT = "dev";
     public static final String SPRING_PROFILE_PRODUCTION = "prod";
@@ -34,7 +29,7 @@ public final class Globals {
     public static final String URL_FIND = "find";
 
 
-    public static final String ALBEDO_QUARTZENABLED = "albedo.quartzEnabled";
+    public static final String APPLICATION_QUARTZENABLED = "application.quartzEnabled";
 
 
     /*** 返回消息状态头 type */

@@ -69,8 +69,8 @@ public class DesUtil {
     // */
     // public static String getRequestKey() {
     // Double num = Math.random() * 100000000;
-    // String key = strEnc(String.valueOf(num.intValue()));
-    // return key;
+    // String T = strEnc(String.valueOf(num.intValue()));
+    // return T;
     // }
 
     /**
@@ -336,7 +336,7 @@ public class DesUtil {
             keyBytes.add(i, strToBt(key.substring(i * 4 + 0, i * 4 + 4)));
         }
         if (remainder > 0) {
-            // keyBytes[i] = strToBt(key.substring(i*4+0,leng));
+            // keyBytes[i] = strToBt(T.substring(i*4+0,leng));
             keyBytes.add(i, strToBt(key.substring(i * 4 + 0, leng)));
         }
         return keyBytes;

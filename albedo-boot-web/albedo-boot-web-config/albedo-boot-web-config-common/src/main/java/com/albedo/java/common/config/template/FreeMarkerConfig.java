@@ -1,7 +1,7 @@
 package com.albedo.java.common.config.template;
 
 import com.albedo.java.common.base.BaseInterface;
-import com.albedo.java.common.config.AlbedoProperties;
+import com.albedo.java.common.config.ApplicationProperties;
 import com.albedo.java.common.config.template.tag.CustomTags;
 import com.albedo.java.common.security.SecurityUtil;
 import com.albedo.java.util.DictUtil;
@@ -30,7 +30,7 @@ public class FreeMarkerConfig implements BaseInterface {
     @Autowired
     protected org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver resolver;
     @Autowired
-    AlbedoProperties albedoProperties;
+    ApplicationProperties applicationProperties;
     BeansWrapperBuilder builder = new BeansWrapperBuilder(freemarker.template.Configuration.VERSION_2_3_25);
     @Autowired
     private CustomTags customTags;
@@ -53,16 +53,17 @@ public class FreeMarkerConfig implements BaseInterface {
         } catch (TemplateException e) {
             e.printStackTrace();
         }
-        configuration.setCustomAttribute("adminPath", albedoProperties.getAdminPath());
-        configuration.setCustomAttribute("application", albedoProperties.getApplication());
+        configuration.setCustomAttribute("adminPath", applicationProperties.getAdminPath());
+        configuration.setCustomAttribute("application", applicationProperties.getName());
         try {
-            configuration.setSharedVariable("application", albedoProperties.getApplication());
+            configuration.setSharedVariable("application", applicationProperties.getName());
         } catch (TemplateModelException e) {
             e.printStackTrace();
         }
-
-        resolver.setCache(true); // 是否缓存模板
-        resolver.setRequestContextAttribute("request"); // 为模板调用时，调用request对象的变量名
+        // 是否缓存模板
+        resolver.setCache(true);
+        // 为模板调用时，调用request对象的变量名
+        resolver.setRequestContextAttribute("request");
         resolver.setOrder(0);
     }
 

@@ -29,7 +29,7 @@ public class Json extends com.alibaba.fastjson.JSON {
      * @return
      */
     public static String toJsonString(Object obj) {
-        return Json.toJSONStringWithDateFormat(obj, PublicUtil.TIME_FORMAT, SerializerFeature.WriteDateUseDateFormat);
+        return toJSONStringWithDateFormat(obj, PublicUtil.TIME_FORMAT, SerializerFeature.WriteDateUseDateFormat);
     }
 
     public static Object toJson(Object obj) {

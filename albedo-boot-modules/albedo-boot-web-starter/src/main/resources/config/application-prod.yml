@@ -39,6 +39,11 @@ spring:
             hibernate.cache.use_query_cache: false
             hibernate.generate_statistics: true
             hibernate.cache.region.factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+    mail:
+        host: localhost
+        port: 25
+        username:
+        password:
     mvc:
 #        view:
 #            prefix: /WEB-INF/views/
@@ -71,11 +76,13 @@ server:
         mime-types: text/html,text/xml,text/plain,text/css, application/javascript, application/json
         min-response-size: 1024
 
+logging:
+    path: /opt/tomcat8/logs/albedo-boot/albedo-boot-web
 # ===================================================================
 # Albedo specific properties
 # ===================================================================
 
-albedo:
+application:
     jedisKeyPrefix: albedoBootWebApp
         developMode: false
         isTokenInterceptor: false

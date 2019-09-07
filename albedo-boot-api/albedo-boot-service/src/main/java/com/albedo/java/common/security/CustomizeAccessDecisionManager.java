@@ -24,7 +24,6 @@ public class CustomizeAccessDecisionManager implements AccessDecisionManager {
             return;
         }
 
-
         Iterator<ConfigAttribute> ite = configAttributes.iterator();
 
         while (ite.hasNext()) {

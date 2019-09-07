@@ -1,33 +1,18 @@
 package com.albedo.java.web.rest.base;
 
-import com.albedo.java.common.config.AlbedoProperties;
 import com.albedo.java.util.BeanValidators;
 import com.albedo.java.util.PublicUtil;
-import com.albedo.java.util.StringUtil;
-import com.albedo.java.util.base.Collections3;
 import com.albedo.java.util.base.Encodes;
 import com.albedo.java.util.domain.CustomMessage;
-import com.albedo.java.util.domain.Globals;
 import com.albedo.java.util.exception.RuntimeMsgException;
-import com.albedo.java.web.rest.errors.CustomParameterizedException;
-import com.albedo.java.web.rest.util.RequestUtil;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 基础控制器支持类 copyright 2014 albedo all right reserved author MrLi created on

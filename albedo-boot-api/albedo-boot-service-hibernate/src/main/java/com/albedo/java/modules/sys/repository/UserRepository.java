@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface UserRepository extends DataRepository<User, String> {
 
 
-    String USERS_BY_LOGIN_CACHE = "usersByLogin";
+    String USERS_BY_LOGIN_CACHE = "usersByLogin1";
 
     Optional<User> findOneByActivationKey(String activationKey);
 
@@ -22,7 +22,7 @@ public interface UserRepository extends DataRepository<User, String> {
 
     Optional<User> findOneByResetKey(String resetKey);
 
-    @Cacheable(cacheNames = USERS_BY_LOGIN_CACHE)
+//    @Cacheable(cacheNames = USERS_BY_LOGIN_CACHE)
     Optional<User> findOneByLoginId(String loginId);
 
     Optional<User> getOneByLoginId(String loginId);

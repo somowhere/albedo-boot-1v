@@ -1,9 +1,11 @@
 package com.albedo.java.util.domain;
 
-import com.albedo.java.util.base.Encodes;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.annotation.JSONType;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.albedo.java.util.base.Encodes;
+import io.swagger.annotations.ApiParam;
+import lombok.Data;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 
 @JSONType(ignores = {"data"})
+@Data
 public class PageModel<T> implements Pageable, Serializable {
 
     public static final String F_DATA = "data";
@@ -25,20 +28,21 @@ public class PageModel<T> implements Pageable, Serializable {
     private int page = 1;
     @JSONField(name="perpage")
     private int size = 10;
-    @JSONField(serialize = false)
+    @JSONField(serialize = false)@ApiParam(hidden = true)
     private Sort sort;
     /**
      * 查询条件json
      */
     @JSONField(serialize = false)
     private String queryConditionJson;
-    @JSONField(serialize = false)
+    @JSONField(serialize = false)@ApiParam(hidden = true)
     private String sqlConditionDsf;
     @JSONField(name="total")
     private long recordsTotal;
 
 
     @JSONField(name = "data", serialzeFeatures = {SerializerFeature.WriteNullListAsEmpty})
+    @ApiParam(hidden = true)
     private List<T> data;
 
     public PageModel() {
@@ -94,6 +98,7 @@ public class PageModel<T> implements Pageable, Serializable {
         this.setSort(sort);
     }
 
+    @ApiParam(hidden = true)
     public long getRecordsTotal() {
         return recordsTotal;
     }
@@ -150,7 +155,7 @@ public class PageModel<T> implements Pageable, Serializable {
     public void setSortName(String sort) {
         if (sort.contains(" ")) {
             String[] sts = sort.split(" ");
-            this.sort = new Sort(Direction.fromString(sts[1]), sts[0]);
+            this.sort = new Sort(sts[1].equals("ascending") ? Direction.ASC : Direction.DESC, sts[0]);
         } else {
             this.sort = new Sort(Direction.ASC, sort);
         }
@@ -164,17 +169,20 @@ public class PageModel<T> implements Pageable, Serializable {
 
     @Override
     @JSONField(serialize = false)
+    @ApiParam(hidden = true)
     public int getPageSize() {
         return size;
     }
 
     @Override
     @JSONField(serialize = false)
+    @ApiParam(hidden = true)
     public int getPageNumber() {
         return page;
     }
 
     @Override
+    @ApiParam(hidden = true)
     public long getOffset() {
         return (page - 1) * size;
     }
@@ -221,6 +229,7 @@ public class PageModel<T> implements Pageable, Serializable {
     }
 
     @Override
+    @ApiParam(hidden = true)
     public Sort getSort() {
         if(sort == null){
             sort=Sort.unsorted();

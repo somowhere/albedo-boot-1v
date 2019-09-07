@@ -3,7 +3,7 @@ package com.albedo.java.web.rest.base;
 import com.albedo.java.util.DateUtil;
 import com.albedo.java.util.Json;
 import com.albedo.java.util.exception.RuntimeMsgException;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,18 +44,18 @@ public class GeneralResource {
     /**
      * 1 管理基础路径
      */
-    @Value("${albedo.adminPath}")
+    @Value("${application.adminPath}")
     protected String adminPath;
 
     /**
      * 前端基础路径
      */
-    @Value("${albedo.frontPath}")
+    @Value("${application.frontPath}")
     protected String frontPath;
     /**
      * 前端URL后缀
      */
-    @Value("${albedo.urlSuffix}")
+    @Value("${application.urlSuffix}")
     protected String urlSuffix;
     /**
      * 验证Bean实例对象

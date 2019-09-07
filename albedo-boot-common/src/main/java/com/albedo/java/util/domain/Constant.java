@@ -36,7 +36,7 @@ public class Constant {
      */
     public final static String SYSTEM_COMET_FLAG = "system.comet.flag";
     /**
-     * 要排除的特殊请求,如果有请填写 ,多个的话用 "," 隔开
+     * 要排除的特殊请求,如果有请填写 ,多个的话用 StringUtil.SPLIT_DEFAULT 隔开
      */
     public final static String SYSTEM_TOKEN_FREEURL = "system.token.freeURL";
     /**

@@ -1,5 +1,6 @@
 package com.albedo.java.util.base;
 
+import com.albedo.java.util.PublicUtil;
 import com.albedo.java.util.exception.RuntimeMsgException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
@@ -191,12 +192,19 @@ public class Assert {
      */
     public static void buildException(String message) {
         if (message != null && !"".equals(message)) {
-            throw new RuntimeMsgException(message, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeMsgException(message, HttpStatus.OK);
         } else {
             throw new RuntimeMsgException();
         }
     }
     public static void buildException(String message, HttpStatus httpStatus) {
         throw new RuntimeMsgException(message, httpStatus);
+    }
+
+    public static void isEmpty(Object mobile, String msg) {
+        Assert.assertIsTrue(PublicUtil.isEmpty(mobile), msg);
+    }
+    public static void isNotEmpty(Object mobile, String msg) {
+        Assert.assertIsTrue(PublicUtil.isNotEmpty(mobile), msg);
     }
 }

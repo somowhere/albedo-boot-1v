@@ -34,7 +34,7 @@ import java.util.Set;
  * @author lj
  * @version 2017-01-23
  */
-@ConditionalOnProperty(name = Globals.ALBEDO_QUARTZENABLED)
+@ConditionalOnProperty(name = Globals.APPLICATION_QUARTZENABLED)
 @Service
 @BaseInit
 public class TaskScheduleJobExcutorService extends DataVoService<TaskScheduleJobRepository,
@@ -107,8 +107,8 @@ public class TaskScheduleJobExcutorService extends DataVoService<TaskScheduleJob
     }
 
     @Override
-    public TaskScheduleJob save(TaskScheduleJob scheduleJob) {
-        return save(scheduleJob, true);
+    public void save(TaskScheduleJob scheduleJob) {
+         save(scheduleJob, true);
     }
 
     /*
@@ -118,7 +118,7 @@ public class TaskScheduleJobExcutorService extends DataVoService<TaskScheduleJob
      * com.albedo.java.modules.sys.service.ITaskScheduleJobService#save(com.
      * albedo.java.modules.sys.domain.TaskScheduleJob)
      */
-    public TaskScheduleJob save(TaskScheduleJob scheduleJob, boolean isAddJob) {
+    public boolean save(TaskScheduleJob scheduleJob, boolean isAddJob) {
         try {
             CronScheduleBuilder.cronSchedule(scheduleJob.getCronExpression());
         } catch (Exception e) {
@@ -148,7 +148,7 @@ public class TaskScheduleJobExcutorService extends DataVoService<TaskScheduleJob
             throw new RuntimeMsgException("未找到目标方法！");
         }
         try {
-            scheduleJob = taskScheduleJobService.save(scheduleJob);
+            taskScheduleJobService.save(scheduleJob);
         } catch (Exception e) {
             log.error("msg {}", e.getMessage());
             throw new RuntimeMsgException("保存失败，检查 name group 组合是否有重复！");
@@ -160,7 +160,7 @@ public class TaskScheduleJobExcutorService extends DataVoService<TaskScheduleJob
                 addJob(scheduleJob);
             }
         }
-        return scheduleJob;
+        return true;
     }
 
     /*

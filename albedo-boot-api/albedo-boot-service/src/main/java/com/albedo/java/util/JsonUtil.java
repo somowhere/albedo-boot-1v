@@ -1,12 +1,12 @@
 package com.albedo.java.util;
 
-import com.albedo.java.modules.sys.domain.Dict;
 import com.albedo.java.util.annotation.DictType;
 import com.albedo.java.util.annotation.JsonField;
 import com.albedo.java.util.base.Collections3;
 import com.albedo.java.util.base.Reflections;
 import com.albedo.java.util.domain.PageModel;
 import com.albedo.java.util.exception.RuntimeMsgException;
+import com.albedo.java.vo.base.SelectResult;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -29,7 +30,7 @@ import java.util.*;
  * @author somewhere version 2014-3-12 下午4:20:24
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class JsonUtil {
+public class JsonUtil extends JSON {
 
     protected static Logger logger = LoggerFactory.getLogger(JsonUtil.class);
     /**
@@ -37,16 +38,14 @@ public class JsonUtil {
      */
     private static List<String> recurrenceStrList = Lists.newArrayList();
     /*** 验证是否属于自定义类 */
-    private static List<String> className = Lists.newArrayList(Reflections.classPackge.split(","));
+    private static List<String> className = Lists.newArrayList(Reflections.classPackge.split(StringUtil.SPLIT_DEFAULT));
     private static JsonUtil json = new JsonUtil();
     /*** 指定当前从数据字典检索的kindIds */
-    private static List<String> kindIds = Lists.newArrayList();
+    private static Map<String, String> kindIdMap = Maps.newHashMap();
     private static String dateFormart = PublicUtil.TIME_FORMAT;
-    /*** 需要从数据字典中查找的key */
-    private static List<String> keyCodeItems = Lists.newArrayList();
-    private static JSONObject codeItemData = new JSONObject();
+    private static Map<String,List<SelectResult>> codeItemData = Maps.newHashMap();
     private static List<String> freeFilterList = Lists.newArrayList("class", "new", "persistentState", "pkName", "pk",
-            "version");
+        "version");
 
     private JsonUtil() {
     }
@@ -54,10 +53,9 @@ public class JsonUtil {
     private static void initConfig() {
         dateFormart = PublicUtil.TIME_FORMAT;
         freeFilterList = Lists.newArrayList("class", "new", "persistentState", "pkName", "pk", "version");
-        className = Lists.newArrayList(Reflections.classPackge.split(","));
-        kindIds.clear();
+        className = Lists.newArrayList(Reflections.classPackge.split(StringUtil.SPLIT_DEFAULT));
+        kindIdMap.clear();
         recurrenceStrList.clear();
-        keyCodeItems.clear();
         codeItemData.clear();
     }
 
@@ -75,38 +73,36 @@ public class JsonUtil {
     public synchronized static JsonUtil getInstance(List<String> kindIds, String... keyCodeItems) {
         initConfig();
         if (PublicUtil.isNotEmpty(kindIds)) {
-            addDictItem(kindIds, keyCodeItems);
+            Map<String, String> map = Maps.newHashMap();
+            for (int i=0,size = kindIds.size(); i<size; i++){
+                map.put(kindIds.get(i), keyCodeItems[i]);
+            }
+            kindIdMap.putAll(map);
         }
+        addDictItem(kindIdMap);
+        return json;
+    }
+    /**
+     * 指定数据列从数据字典中获取(注意顺序对应)
+     *
+     * @param map kindId-filed
+     */
+    public synchronized static JsonUtil getInstance(Map<String, String> map) {
+        initConfig();
+        kindIdMap.putAll(map);
+        addDictItem(kindIdMap);
         return json;
     }
 
-    private synchronized static void addDictItem(List<String> kindIds, String... keyCodeItems) {
-        if (keyCodeItems != null) {
-            for (int i = 0; i < keyCodeItems.length; i++) {
-                if (!JsonUtil.keyCodeItems.contains(keyCodeItems[i])) {
-                    JsonUtil.keyCodeItems.add(keyCodeItems[i]);
-                }
+    private synchronized static void addDictItem(Map<String, String> map) {
+        List<String> kindIds = Lists.newArrayList(map.keySet().iterator()),
+            kindIdsToAdd = Lists.newArrayList();
+        for (String kindId : kindIds){
+            if(!codeItemData.containsKey(kindId)){
+                kindIdsToAdd.add(kindId);
             }
         }
-        JsonUtil.kindIds.addAll(kindIds);
-        Map<String, Object> maps = new HashMap<String, Object>();
-        Map<String, String> map;
-        List<Dict> itemList;
-        for (String kid : kindIds) {
-            if (codeItemData.get(kid) == null) {
-                itemList = DictUtil.getAllDictList(kid);
-                if (PublicUtil.isNotEmpty(itemList)) {
-                    map = Maps.newHashMap();
-                    for (Dict code : itemList) {
-                        map.put(code.getVal(), code.getName());
-                    }
-                    maps.put(kid, map);
-                }
-            }
-        }
-
-
-        codeItemData.putAll(maps);
+        codeItemData.putAll(DictUtil.getCodeList(kindIdsToAdd));
     }
 
     public static String toJsonString(Object obj) {
@@ -119,8 +115,8 @@ public class JsonUtil {
      * @return
      */
     public static String toJsonString(Object obj, String recurrenceStr) {
-        JSON rs = JsonUtil.getInstance().removeFreeFilterList("version").setRecurrenceStr(recurrenceStr.split(","))
-                .toJsonObject(obj);
+        JSON rs = JsonUtil.getInstance().removeFreeFilterList("version").setRecurrenceStr(recurrenceStr.split(StringUtil.SPLIT_DEFAULT))
+            .toJsonObject(obj);
         return rs.toJSONString();
     }
 
@@ -131,7 +127,7 @@ public class JsonUtil {
      * @return
      */
     public static String toJsonString(Object obj, String recurrenceStr, String kindIdStr) {
-        String[] kindIds = kindIdStr.split(",");
+        String[] kindIds = kindIdStr.split(StringUtil.SPLIT_DEFAULT);
         String[] items = new String[kindIds.length];
         List<String> listKind = Lists.newArrayList();
         for (int i = 0; i < kindIds.length; i++) {
@@ -139,7 +135,7 @@ public class JsonUtil {
             items[i] = kindIds[i].substring(kindIds[i].indexOf(":") + 1);
         }
         JSON rs = JsonUtil.getInstance(listKind, items).removeFreeFilterList("version")
-                .setRecurrenceStr(recurrenceStr.split(",")).toJsonObject(obj);
+            .setRecurrenceStr(recurrenceStr.split(StringUtil.SPLIT_DEFAULT)).toJsonObject(obj);
         return rs.toJSONString();
     }
 
@@ -360,9 +356,10 @@ public class JsonUtil {
                     if (attr.contains(".")) {
                         attr = attr.replace(".", "_");
                     }
-                    if (PublicUtil.isNotEmpty(kindIds) && PublicUtil.isNotEmpty(codeItemData)
-                            && PublicUtil.isNotEmpty(keyCodeItems) && keyCodeItems.contains(attr)) {
-                        val = codeItemData.getJSONObject(kindIds.get(keyCodeItems.indexOf(attr))).get((String) objs[i]);
+
+                    if (PublicUtil.isNotEmpty(kindIdMap)
+                        && kindIdMap.containsValue(attr)) {
+                        val = getDictVal(codeItemData.get(getKindIdMapByField(attr)), objs[i]);
                     } else {
                         val = objs[i];
                     }
@@ -380,6 +377,29 @@ public class JsonUtil {
         return maps;
     }
 
+    private String getKindIdMapByField(String field){
+        String kindId = null;
+        Iterator<String> iterator = kindIdMap.keySet().iterator();
+        while (iterator.hasNext()){
+            String key = iterator.next();
+            if(field.equals(kindIdMap.get(key))){
+                kindId = key;
+                break;
+            }
+        }
+        return kindId;
+
+    }
+
+    private Object getDictVal(List<SelectResult> selectResults,Object value){
+        for (int i=0,size=selectResults.size();i<size;i++){
+            SelectResult selectResult = selectResults.get(i);
+            if( selectResult.getValue().equals(value)){
+                return selectResult.getLabel();
+            }
+        }
+        return null;
+    }
     /**
      * 将obj转换为map
      *
@@ -439,8 +459,9 @@ public class JsonUtil {
                         List<String> argList = Lists.newArrayList(clsName);
                         key = PublicUtil.toAppendStr(Collections3.convertToString(argList, "_"), "_", key);
                     }
+                    String saveKey = getKey(key, jf);
                     if (PublicUtil.isEmpty(val) && jf != null && jf.serialzeFeatures() != null) {
-                        mapPutValue(maps, getKey(key, jf), val);
+                        mapPutValue(maps, saveKey, val);
                     }
                     if (val instanceof Collection<?> && flag) {
                         Iterator<?> iter = ((Collection<?>) val).iterator();
@@ -450,10 +471,11 @@ public class JsonUtil {
                             if (checkClassName(objTemp.getClass().getName())) {
                                 list.add(objToMap(objTemp));
                             } else {
-                                list.add(toJsonObject(objTemp));
+                                boolean isBaseType = objTemp instanceof Map || objTemp instanceof Collection || checkClassName(obj.getClass().getName());
+                                list.add(isBaseType ? objTemp : toJsonObject(objTemp));
                             }
                         }
-                        mapPutValue(maps, getKey(key, jf), list);
+                        mapPutValue(maps, saveKey, list);
                     } else {
                         boolean falg = false;
                         try {
@@ -469,7 +491,7 @@ public class JsonUtil {
                             if (PublicUtil.isNotEmpty(recurrenceStrList) && !key.contains("_")) {
                                 for (String reKey : recurrenceStrList) {
                                     if (reKey.startsWith(PublicUtil.toAppendStr(key, "_"))
-                                            && reKey.indexOf("_") != -1) {
+                                        && reKey.indexOf("_") != -1) {
                                         tempReKey.add(reKey);
                                     }
                                 }
@@ -493,13 +515,20 @@ public class JsonUtil {
                             }
                             continue;
                         }
-                        mapPutValue(maps, getKey(key, jf), getVal(obj, val, key));
+                        Object saveVal = getVal(obj, val, key);
+                        if (PublicUtil.isNotEmpty(saveVal) && PublicUtil.isNotEmpty(val)
+                            && !saveVal.equals(val) && !(val instanceof Timestamp) && !(val instanceof Date)) {
+                            mapPutValue(maps, saveKey, val);
+                            mapPutValue(maps, saveKey+"Text", saveVal);
+                        }else{
+                            mapPutValue(maps, saveKey, saveVal);
+                        }
+
                     }
                 }
             }
         } catch (Exception e) {
-            logger.error("在将对象转换成Map的ObjToMap中出现异常对象-->" + e.getMessage());
-            e.printStackTrace();
+            logger.error("在将对象转换成Map的ObjToMap中出现异常对象-->{}", e);
         }
         return maps;
     }
@@ -517,9 +546,6 @@ public class JsonUtil {
             DictType type = Reflections.getAnnotation(obj, fieldName, DictType.class);
             if (type != null) {
                 String kindId = type.name();
-                if (PublicUtil.isEmpty(keyCodeItems) || !keyCodeItems.contains(fieldName)) {
-                    addDictItem(Lists.newArrayList(kindId), fieldName);
-                }
                 result = getDictVal(result, kindId, fieldName);
             }
         } catch (IllegalAccessException e) {
@@ -539,25 +565,27 @@ public class JsonUtil {
     }
 
 
-    private JSONObject getCodeItemData(String kindId, String key) {
-        JSONObject jobj = codeItemData.getJSONObject(kindId);
+    private List<SelectResult> getCodeItemData(String kindId, String key) {
+        List<SelectResult> jobj = codeItemData.get(kindId);
         if (jobj == null) {
-            addDictItem(Lists.newArrayList(kindId), key);
+            addDictItem(new HashMap<String,String>(){{
+                put(kindId, key);
+            }});
         }
-        jobj = codeItemData.getJSONObject(kindId);
+        jobj = codeItemData.get(kindId);
         return jobj;
     }
 
     private Object getDictVal(Object val, String kindId, String key) {
-        JSONObject jobj = getCodeItemData(kindId, key);
-        if (jobj != null) {
+        List<SelectResult> selectResults = getCodeItemData(kindId, key);
+        if (selectResults != null) {
             String valStr = val + "";
-            if (valStr.contains(",")) {
+            if (valStr.contains(StringUtil.SPLIT_DEFAULT)) {
                 StringBuffer temp = new StringBuffer();
-                String[] vals = valStr.split(",");
+                String[] vals = valStr.split(StringUtil.SPLIT_DEFAULT);
                 for (String item : vals) {
                     if (PublicUtil.isNotEmpty(item)) {
-                        temp.append(jobj.get(item)).append(",");
+                        temp.append(getDictVal(selectResults, item)).append(StringUtil.SPLIT_DEFAULT);
                     }
                 }
                 if (temp.length() > 0) {
@@ -565,7 +593,7 @@ public class JsonUtil {
                 }
                 val = temp.toString();
             } else {
-                val = jobj.get(valStr);
+                val = getDictVal(selectResults, valStr);
             }
         } else {
             logger.warn("无法查询到kindId {} val {}  的字典对象", kindId, val);
@@ -581,21 +609,25 @@ public class JsonUtil {
     }
 
     private Object getVal(Object obj, Object val, String key) {
-        if (PublicUtil.isNotEmpty(kindIds) && PublicUtil.isNotEmpty(keyCodeItems) && keyCodeItems.contains(key)) {
-            val = getDictVal(val, kindIds.get(keyCodeItems.indexOf(key)), key);
+        Object rs = null;
+        if (PublicUtil.isNotEmpty(kindIdMap) && kindIdMap.containsValue(key)) {
+            rs = getDictVal(val, getKindIdMapByField(key), key);
         } else {
             Object temp = getFieldDictValue(obj, key);
             if (temp != null) {
-                val = temp;
+                rs = temp;
             }
         }
         if (val instanceof Date) {
-            val = PublicUtil.fmtDate((Date) val, dateFormart);
+            rs = PublicUtil.fmtDate((Date) val, dateFormart);
         }
         if (val instanceof ZonedDateTime) {
-            val = PublicUtil.fmtDate((ZonedDateTime) val, dateFormart);
+            rs = PublicUtil.fmtDate((ZonedDateTime) val, dateFormart);
         }
-        return val;
+        if(rs==null){
+            rs = val;
+        }
+        return rs;
     }
 
 }

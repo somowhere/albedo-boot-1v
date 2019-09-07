@@ -1,12 +1,13 @@
 package com.albedo.java.util;
 
 import com.albedo.java.util.base.Reflections;
-import com.albedo.java.util.domain.ComboData;
 import com.albedo.java.vo.base.SelectResult;
 import com.google.common.collect.Lists;
+import com.albedo.java.util.domain.ComboData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+//import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -39,6 +40,7 @@ public class PublicUtil {
      */
     public static final String TIME_FORMAT_S = "yyyy-MM-dd HH:mm:ss.sss";
     protected static Logger logger = LoggerFactory.getLogger(PublicUtil.class);
+
 
     /**
      * 转换html标签
@@ -320,8 +322,9 @@ public class PublicUtil {
      * @author somewhere
      */
     public static boolean isEmpty(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return true;
+        }
         // 如果不为null，需要处理几种特殊对象类型
         if (obj instanceof String) {
             return obj.equals("");
@@ -469,14 +472,14 @@ public class PublicUtil {
 
         // System.out.println(retValue);
 
-        retValue = retValue.replaceAll(",", "");
+        retValue = retValue.replaceAll(StringUtil.SPLIT_DEFAULT, "");
 
         return retValue;
 
     }
 
     public static String roundStr(Double value) {
-        java.text.DecimalFormat df = new java.text.DecimalFormat("#.00");
+        DecimalFormat df = new DecimalFormat("#.00");
         return df.format(value);
     }
 
@@ -672,4 +675,6 @@ public class PublicUtil {
             PublicUtil.toStrString(Reflections.invokeGetter(item, nameFieldName)))));
         return selectResultList;
     }
+
+
 }// class end

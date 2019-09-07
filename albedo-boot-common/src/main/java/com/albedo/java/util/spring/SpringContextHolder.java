@@ -1,5 +1,6 @@
 package com.albedo.java.util.spring;
 
+import com.albedo.java.common.config.ApplicationProperties;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,16 +19,13 @@ import org.springframework.stereotype.Component;
 public class SpringContextHolder implements ApplicationContextAware, DisposableBean {
 
     private static ApplicationContext applicationContext = null;
-    //	private static final String contextPath[] = { "classpath:applicationContext*.xml" };
     private static Logger logger = LoggerFactory.getLogger(SpringContextHolder.class);
-
-
 
     /**
      * 取得存储在静态变量中的ApplicationContext.
      */
     public static ApplicationContext getApplicationContext() {
-        assertContextInjected();
+//        assertContextInjected();
         return applicationContext;
     }
 
@@ -78,9 +76,6 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
      * 检查ApplicationContext不为空.
      */
     private static void assertContextInjected() {
-//		if (applicationContext == null) {
-//			applicationContext = new ClassPathXmlApplicationContext(contextPath);
-//		}
         Validate.validState(applicationContext != null, "applicaitonContext属性未注入, 请在applicationContext.xml中定义SpringContextHolder.");
     }
 
@@ -90,4 +85,6 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
     public void destroy() throws Exception {
         SpringContextHolder.clearHolder();
     }
+
+
 }

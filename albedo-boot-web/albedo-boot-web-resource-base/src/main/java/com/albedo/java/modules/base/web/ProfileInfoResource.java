@@ -1,6 +1,6 @@
 package com.albedo.java.modules.base.web;
 
-import com.albedo.java.common.config.AlbedoProperties;
+import com.albedo.java.common.config.ApplicationProperties;
 import com.albedo.java.util.spring.DefaultProfileUtil;
 import com.albedo.java.web.rest.vm.ProfileInfoVM;
 import org.springframework.core.env.Environment;
@@ -17,16 +17,16 @@ import java.util.List;
  * @author somewhere
  */
 @RestController
-@RequestMapping("${albedo.adminPath}")
+@RequestMapping("${application.adminPath}")
 public class ProfileInfoResource {
 
     private Environment environment;
 
-    private AlbedoProperties albedoProperties;
+    private ApplicationProperties applicationProperties;
 
-    public ProfileInfoResource(Environment environment, AlbedoProperties albedoProperties) {
+    public ProfileInfoResource(Environment environment, ApplicationProperties applicationProperties) {
         this.environment = environment;
-        this.albedoProperties = albedoProperties;
+        this.applicationProperties = applicationProperties;
     }
 
     @GetMapping(value = "/profile-info",
@@ -37,7 +37,7 @@ public class ProfileInfoResource {
 
     private String getRibbonEnv() {
         String[] activeProfiles = DefaultProfileUtil.getActiveProfiles(environment);
-        String[] displayOnActiveProfiles = albedoProperties.getRibbon().getDisplayOnActiveProfiles();
+        String[] displayOnActiveProfiles = applicationProperties.getRibbon().getDisplayOnActiveProfiles();
 
         if (displayOnActiveProfiles == null) {
             return null;

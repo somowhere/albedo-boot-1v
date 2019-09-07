@@ -1,13 +1,13 @@
 package com.albedo.java.vo.gen;
 
-import com.albedo.java.util.PublicUtil;
 import com.albedo.java.util.StringUtil;
 import com.albedo.java.util.config.SystemConfig;
-import com.albedo.java.vo.base.DataEntityVo;
-import com.albedo.java.vo.base.TreeEntityVo;
 import com.albedo.java.vo.util.GenTableColumnVoUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.google.common.collect.Lists;
+import com.albedo.java.util.PublicUtil;
+import com.albedo.java.vo.base.DataEntityVo;
+import com.albedo.java.vo.base.TreeEntityVo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -163,7 +163,7 @@ public class GenTableColumnVo extends DataEntityVo<String> implements Comparable
      * @return
      */
     public String getDataLength() {
-        String[] ss = StringUtil.split(StringUtil.substringBetween(getJdbcType(), "(", ")"), ",");
+        String[] ss = StringUtil.split(StringUtil.substringBetween(getJdbcType(), "(", ")"), StringUtil.SPLIT_DEFAULT);
         if (ss != null && ss.length == 1) {// &&
             // SystemConfig.TYPE_STRING.equals(getJavaType())){
             return ss[0];
@@ -191,7 +191,7 @@ public class GenTableColumnVo extends DataEntityVo<String> implements Comparable
     @JSONField(serialize = false)
     public String getSimpleTsType() {
         String javaSimpleType = getSimpleJavaType();
-        return (javaSimpleType.indexOf("Integer")!=-1 || javaSimpleType.indexOf("Double")!=-1 || javaSimpleType.indexOf("Float")!=-1) ? "number" : "string";
+        return PublicUtil.isNotEmpty(javaSimpleType) && (javaSimpleType.indexOf("Integer")!=-1 || javaSimpleType.indexOf("Double")!=-1 || javaSimpleType.indexOf("Float")!=-1) ? "number" : "string";
     }
     /**
      * 获取简写Java字段
@@ -286,9 +286,9 @@ public class GenTableColumnVo extends DataEntityVo<String> implements Comparable
         if (!"1".equals(getIsNull()) && !SystemConfig.TYPE_STRING.equals(getJavaType())) {
             list.add("javax.validation.constraints.NotNull(message=\"" + getTitle() + "不能为空\")");
         } else if (!"1".equals(getIsNull()) && SystemConfig.TYPE_STRING.equals(getJavaType()) && !"0".equals(getDataLength())) {
-            list.add("org.hibernate.validator.constraints.Length(min=1, max=" + getDataLength() + ", message=\"" + getTitle() + "长度必须介于 1 和 " + getDataLength() + " 之间\")");
+            list.add("javax.validation.constraints.Size(min=1, max=" + getDataLength() + ", message=\"" + getTitle() + "长度必须介于 1 和 " + getDataLength() + " 之间\")");
         } else if (SystemConfig.TYPE_STRING.equals(getJavaType()) && !"0".equals(getDataLength())) {
-            list.add("org.hibernate.validator.constraints.Length(min=0, max=" + getDataLength() + ", message=\"" + getTitle() + "长度必须介于 0 和 " + getDataLength() + " 之间\")");
+            list.add("javax.validation.constraints.Size(min=0, max=" + getDataLength() + ", message=\"" + getTitle() + "长度必须介于 0 和 " + getDataLength() + " 之间\")");
         }
         return list;
     }
@@ -312,14 +312,14 @@ public class GenTableColumnVo extends DataEntityVo<String> implements Comparable
      * @return
      */
     public Boolean getIsNotBaseField() {
-        return !StringUtil.equals(getSimpleJavaField(), DataEntityVo.F_ID) && !StringUtil.equals(getName(), "id_") &&
-                !StringUtil.equals(getSimpleJavaField(), DataEntityVo.F_DESCRIPTION) && !StringUtil.equals(getName(), "description_")
-                && !StringUtil.equals(getSimpleJavaField(), DataEntityVo.F_CREATEDBY) && !StringUtil.equals(getName(), "created_by") &&
-                !StringUtil.equals(getSimpleJavaField(), DataEntityVo.F_CREATEDDATE) && !StringUtil.equals(getName(), "created_date")
-                && !StringUtil.equals(getSimpleJavaField(), DataEntityVo.F_LASTMODIFIEDBY) && !StringUtil.equals(getName(), "last_modified_by") &&
-                !StringUtil.equals(getSimpleJavaField(), DataEntityVo.F_LASTMODIFIEDDATE) && !StringUtil.equals(getName(), "last_modified_date")
-                && !StringUtil.equals(getSimpleJavaField(), DataEntityVo.F_STATUS) && !StringUtil.equals(getName(), "status_") &&
-                !StringUtil.equals(getSimpleJavaField(), DataEntityVo.F_VERSION) && !StringUtil.equals(getName(), "version_");
+        return !StringUtil.equals(getSimpleJavaField(), DataEntityVo.F_ID) && !StringUtil.equalsIgnoreCase(getName(), "id_") &&
+                !StringUtil.equals(getSimpleJavaField(), DataEntityVo.F_DESCRIPTION) && !StringUtil.equalsIgnoreCase(getName(), "description_")
+                && !StringUtil.equals(getSimpleJavaField(), DataEntityVo.F_CREATEDBY) && !StringUtil.equalsIgnoreCase(getName(), "created_by") &&
+                !StringUtil.equals(getSimpleJavaField(), DataEntityVo.F_CREATEDDATE) && !StringUtil.equalsIgnoreCase(getName(), "created_date")
+                && !StringUtil.equals(getSimpleJavaField(), DataEntityVo.F_LASTMODIFIEDBY) && !StringUtil.equalsIgnoreCase(getName(), "last_modified_by") &&
+                !StringUtil.equals(getSimpleJavaField(), DataEntityVo.F_LASTMODIFIEDDATE) && !StringUtil.equalsIgnoreCase(getName(), "last_modified_date")
+                && !StringUtil.equals(getSimpleJavaField(), DataEntityVo.F_STATUS) && !StringUtil.equalsIgnoreCase(getName(), "status_") &&
+                !StringUtil.equals(getSimpleJavaField(), DataEntityVo.F_VERSION) && !StringUtil.equalsIgnoreCase(getName(), "version_");
     }
 
     /**
@@ -328,13 +328,13 @@ public class GenTableColumnVo extends DataEntityVo<String> implements Comparable
      * @return
      */
     public Boolean getIsNotBaseTreeField() {
-        return !StringUtil.equals(getSimpleJavaField(), TreeEntityVo.F_NAME) && !StringUtil.equals(getName(), "name_") &&
+        return !StringUtil.equals(getSimpleJavaField(), TreeEntityVo.F_NAME) && !StringUtil.equals(getName(), "NAME_") &&
                 !StringUtil.equals(getSimpleJavaField(), TreeEntityVo.F_PARENTID) && !StringUtil.equals(getSimpleJavaField(), "parent")
                 && !StringUtil.equals(getName(), "parent_id") &&
                 !StringUtil.equals(getSimpleJavaField(), TreeEntityVo.F_PARENTIDS)
                 && !StringUtil.equals(getName(), "parent_ids")
                 && !StringUtil.equals(getSimpleJavaField(), TreeEntityVo.F_SORT)
-                && !StringUtil.equals(getName(), "sort_")
+                && !StringUtil.equals(getName(), "SORT_")
                 && !StringUtil.equals(getSimpleJavaField(), TreeEntityVo.F_ISLEAF)
                 && !StringUtil.equals(getName(), "is_leaf");
 

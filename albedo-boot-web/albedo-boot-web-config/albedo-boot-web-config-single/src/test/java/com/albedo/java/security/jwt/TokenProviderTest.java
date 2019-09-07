@@ -1,6 +1,6 @@
 package com.albedo.java.security.jwt;
 
-import com.albedo.java.common.config.AlbedoProperties;
+import com.albedo.java.common.config.ApplicationProperties;
 import com.albedo.java.common.security.AuthoritiesConstants;
 import com.albedo.java.common.security.jwt.TokenProvider;
 import io.jsonwebtoken.Jwts;
@@ -24,13 +24,13 @@ public class TokenProviderTest {
 
     private final String secretKey = "e5c9ee274ae87bc031adda32e27fa98b9290da83";
     private final long ONE_MINUTE = 60000;
-    private AlbedoProperties albedoProperties;
+    private ApplicationProperties applicationProperties;
     private TokenProvider tokenProvider;
 
     @Before
     public void setup() {
-        albedoProperties = Mockito.mock(AlbedoProperties.class);
-        tokenProvider = new TokenProvider(albedoProperties);
+        applicationProperties = Mockito.mock(ApplicationProperties.class);
+        tokenProvider = new TokenProvider(applicationProperties);
         ReflectionTestUtils.setField(tokenProvider, "secretKey", secretKey);
         ReflectionTestUtils.setField(tokenProvider, "tokenValidityInMilliseconds", ONE_MINUTE);
     }

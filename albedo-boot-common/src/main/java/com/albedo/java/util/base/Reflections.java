@@ -3,9 +3,9 @@ package com.albedo.java.util.base;
 import com.albedo.java.util.BeanVoUtil;
 import com.albedo.java.util.PublicUtil;
 import com.albedo.java.util.StringUtil;
-import com.albedo.java.util.config.SystemConfig;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.albedo.java.util.config.SystemConfig;
 import javassist.*;
 import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.LocalVariableAttribute;
@@ -47,7 +47,7 @@ public class Reflections {
 
     public static boolean checkClassIsBase(String className) {
         if (PublicUtil.isNotEmpty(className) && PublicUtil.isNotEmpty(classPackge)) {
-            String[] strs = classPackge.split(",");
+            String[] strs = classPackge.split(StringUtil.SPLIT_DEFAULT);
             for (String item : strs) {
                 if (className.contains(item)) {
                     return true;
@@ -986,5 +986,6 @@ public class Reflections {
     public static void main(String[] args) {
         System.out.println(getMethodParameter("com.albedo.java.modules.sys.controller.AreaController", "findTreeData"));
     }
+
 
 }

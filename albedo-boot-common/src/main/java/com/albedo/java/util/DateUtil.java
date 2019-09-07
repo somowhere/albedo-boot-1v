@@ -17,7 +17,7 @@ import java.util.Date;
  */
 public class DateUtil extends DateUtils {
 
-    private static String[] parsePatterns = {"yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.s", "yyyy-MM-dd HH:mm", "yyyy", "yyyyMM", "yyyy-MM", "yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm", "yyyy/MM", "yyyy.MM.dd",
+    private static String[] parsePatterns = {"yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.sss'Z'", "yyyy-MM-dd HH:mm:ss.s", "yyyy-MM-dd HH:mm", "yyyy", "yyyyMM", "yyyy-MM", "yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm", "yyyy/MM", "yyyy.MM.dd",
             "yyyy.MM.dd HH:mm:ss", "yyyy.MM.dd HH:mm", "yyyy.MM"};
 
     /**
@@ -155,7 +155,7 @@ public class DateUtil extends DateUtils {
         long min = ((timeMillis / (60 * 1000)) - day * 24 * 60 - hour * 60);
         long s = (timeMillis / 1000 - day * 24 * 60 * 60 - hour * 60 * 60 - min * 60);
         long sss = (timeMillis - day * 24 * 60 * 60 * 1000 - hour * 60 * 60 * 1000 - min * 60 * 1000 - s * 1000);
-        return (day > 0 ? day + "," : "") + hour + ":" + min + ":" + s + "." + sss;
+        return (day > 0 ? day + StringUtil.SPLIT_DEFAULT : "") + hour + ":" + min + ":" + s + "." + sss;
     }
 
     /**

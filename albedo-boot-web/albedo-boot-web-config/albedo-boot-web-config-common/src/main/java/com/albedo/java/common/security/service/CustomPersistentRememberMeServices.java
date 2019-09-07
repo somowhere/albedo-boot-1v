@@ -1,6 +1,6 @@
 package com.albedo.java.common.security.service;//package com.albedo.java.common.security.service;
 //
-//import com.albedo.java.common.config.AlbedoProperties;
+//import com.albedo.java.common.config.ApplicationProperties;
 //import com.albedo.java.modules.sys.domain.PersistentToken;
 //import com.albedo.java.modules.sys.repository.PersistentTokenRepository;
 //import com.albedo.java.modules.sys.repository.UserRepository;
@@ -67,9 +67,9 @@ package com.albedo.java.common.security.service;//package com.albedo.java.common
 //    @Autowired
 //    private UserRepository userRepository;
 //
-//    public CustomPersistentRememberMeServices(AlbedoProperties albedoProperties, org.springframework.security.core.userdetails
-//            .UserDetailsService userDetailsService) {
-//        super(albedoProperties.getSecurity().getRememberMe().getKey(), userDetailsService);
+//    public CustomPersistentRememberMeServices(ApplicationProperties ApplicationProperties, org.springframework.security.core.userdetails
+//            .UserCustomDetailsService userDetailsService) {
+//        super(ApplicationProperties.getSecurity().getRememberMe().getKey(), userDetailsService);
 //        random = new SecureRandom();
 //    }
 //

@@ -1,7 +1,7 @@
 package com.albedo.java.web.rest.vm;
 
 /**
- * View Model object for storing the user's key and password.
+ * View Model object for storing the user's T and password.
  */
 public class KeyAndPasswordVM {
 

@@ -1,6 +1,7 @@
 package com.albedo.java.modules.sys.domain;
 
 import com.albedo.java.common.persistence.domain.TreeEntity;
+import com.albedo.java.common.persistence.domain.TreeUserEntity;
 import com.albedo.java.util.StringUtil;
 import com.albedo.java.util.annotation.DictType;
 import com.albedo.java.util.annotation.SearchField;
@@ -27,7 +28,7 @@ import javax.persistence.Transient;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Data
 @EqualsAndHashCode(callSuper=true)
-public class Module extends TreeEntity<Module> {
+public class Module extends TreeUserEntity<Module> {
 
     public static final String F_ID = "id";
     /*** 菜单模块 MENUFLAG = 0 */
@@ -60,9 +61,6 @@ public class Module extends TreeEntity<Module> {
     @Column(name = "permission_")
     @SearchField
     private String permission;
-    /*** 针对顶层菜单，0 普通展示下级菜单， 1以树形结构展示 */
-    @Column(name = "show_type")
-    private String showType;
     /*** 服务名称 */
     @Column(name = "microservice_")
     private String microservice;
@@ -172,14 +170,6 @@ public class Module extends TreeEntity<Module> {
 
     public void setPermission(String permission) {
         this.permission = permission;
-    }
-
-    public String getShowType() {
-        return showType;
-    }
-
-    public void setShowType(String showType) {
-        this.showType = showType;
     }
 
     public boolean isShow() {

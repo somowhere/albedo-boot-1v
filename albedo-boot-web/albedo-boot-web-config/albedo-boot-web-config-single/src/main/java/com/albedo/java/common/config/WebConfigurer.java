@@ -31,7 +31,6 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.annotation.Resource;
 import javax.servlet.*;
@@ -52,7 +51,7 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
     private Environment env;
 
     @Resource
-    private AlbedoProperties albedoProperties;
+    private ApplicationProperties applicationProperties;
 
     private MetricRegistry metricRegistry;
 
@@ -61,9 +60,9 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
         this.metricRegistry = metricRegistry;
     }
 
-    public WebConfigurer(Environment env, AlbedoProperties props) {
+    public WebConfigurer(Environment env, ApplicationProperties props) {
         this.env = env;
-        this.albedoProperties=props;
+        this.applicationProperties =props;
     }
 
 
@@ -82,9 +81,9 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
         log.debug("Registering bodyFilter");
         FilterRegistration.Dynamic bodyFilter = servletContext.addFilter(
             "bodyFilter",
-            new BodyFilter(albedoProperties));
+            new BodyFilter(applicationProperties));
         bodyFilter.addMappingForUrlPatterns(disps, true,
-            albedoProperties.getAdminPath("/*"));
+            applicationProperties.getAdminPath("/*"));
         bodyFilter.setAsyncSupported(true);
 
         log.info("Web application fully configured");
@@ -105,10 +104,10 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
         /*
          * Enable HTTP/2 for Undertow - https://twitter.com/ankinson/status/829256167700492288
          * HTTP/2 requires HTTPS, so HTTP requests will fallback to HTTP/1.1.
-         * See the AlbedoProperties class and your application-*.yml configuration files
+         * See the ApplicationProperties class and your application-*.yml configuration files
          * for more information.
          */
-        if (albedoProperties.getHttp().getVersion().equals(AlbedoProperties.Http.Version.V_2_0) &&
+        if (applicationProperties.getHttp().getVersion().equals(ApplicationProperties.Http.Version.V_2_0) &&
             server instanceof UndertowServletWebServerFactory) {
             ((UndertowServletWebServerFactory) server)
                 .addBuilderCustomizers(builder ->
@@ -128,6 +127,7 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
         }
     }
     private void setLocationForStaticAssets(WebServerFactory server) {
+        log.info("server:"+server);
         if (server instanceof ConfigurableServletWebServerFactory) {
             ConfigurableServletWebServerFactory servletWebServer = (ConfigurableServletWebServerFactory) server;
             File root;
@@ -135,6 +135,7 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
             if (PublicUtil.isEmpty(prefixPath)) {
                 prefixPath = DefaultProfileUtil.resolvePathPrefix(this.getClass()) + "src/main/webapp/";
             }
+            log.info("web root:"+prefixPath);
             root = new File(prefixPath);
             if (root.exists() && root.isDirectory()) {
                 servletWebServer.setDocumentRoot(root);
@@ -149,7 +150,7 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
     private void initCachingHttpHeadersFilter(ServletContext servletContext, EnumSet<DispatcherType> disps) {
         log.debug("Registering Caching HTTP Headers Filter");
         FilterRegistration.Dynamic cachingHttpHeadersFilter = servletContext.addFilter("cachingHttpHeadersFilter",
-                new CachingHttpHeadersFilter(albedoProperties));
+                new CachingHttpHeadersFilter(applicationProperties));
 
         cachingHttpHeadersFilter.addMappingForUrlPatterns(disps, true, "/statics/*", "/WEB-INF/views/*", "classpath:/statics/*", "classpath:/WEB-INF/views/*");
         cachingHttpHeadersFilter.setAsyncSupported(true);
@@ -164,7 +165,7 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
 //                "pageInitParamFilter",
 //                new PageInitParamFilter());
 //        pageInitParamFilter.addMappingForUrlPatterns(disps, true,
-//                albedoProperties.getAdminPath("/*"));
+//                ApplicationProperties.getAdminPath("/*"));
 //        pageInitParamFilter.setAsyncSupported(true);
 //    }
 
@@ -188,7 +189,7 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
         ServletRegistration.Dynamic metricsAdminServlet = servletContext.addServlet("metricsServlet",
                 new MetricsServlet());
 
-        metricsAdminServlet.addMapping(albedoProperties.getAdminPath("/management/metrics/*"));
+        metricsAdminServlet.addMapping(applicationProperties.getAdminPath("/management/metrics/*"));
         metricsAdminServlet.setAsyncSupported(true);
         metricsAdminServlet.setLoadOnStartup(2);
 
@@ -197,10 +198,10 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = albedoProperties.getCors();
+        CorsConfiguration config = applicationProperties.getCors();
         if (config.getAllowedOrigins() != null && !config.getAllowedOrigins().isEmpty()) {
             log.debug("Registering CORS filter");
-            source.registerCorsConfiguration(albedoProperties.getAdminPath("/**"), config);
+            source.registerCorsConfiguration(applicationProperties.getAdminPath("/**"), config);
             source.registerCorsConfiguration("/management/**", config);
             source.registerCorsConfiguration("/v2/api-docs", config);
         }
@@ -236,12 +237,12 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
 //    }
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new OperateInterceptor(albedoProperties)).addPathPatterns(albedoProperties.getAdminPath("/**"), "/management/**", "/api/**");
+        registry.addInterceptor(new OperateInterceptor(applicationProperties)).addPathPatterns(applicationProperties.getAdminPath("/**"), "/management/**", "/api/**");
     }
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName(PublicUtil.isEmpty(albedoProperties.getDefaultView()) ? "index.html" : albedoProperties.getDefaultView());
+        registry.addViewController("/").setViewName(PublicUtil.isEmpty(applicationProperties.getDefaultView()) ? "index.html" : applicationProperties.getDefaultView());
         registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
     }
     @Bean

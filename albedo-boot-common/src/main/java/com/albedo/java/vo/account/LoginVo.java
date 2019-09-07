@@ -1,8 +1,8 @@
 package com.albedo.java.vo.account;
 
 
-import com.albedo.java.util.domain.Globals;
 import com.albedo.java.vo.sys.UserVo;
+import com.albedo.java.util.domain.Globals;
 import lombok.Data;
 import lombok.ToString;
 
@@ -17,13 +17,14 @@ import javax.validation.constraints.Size;
 @ToString
 public class LoginVo {
 
-    @Pattern(regexp = Globals.LOGIN_REGEX)
+    @Pattern(regexp = Globals.LOGIN_REGEX, message = "登录名格式不合法")
     @NotNull
     @Size(min = 1, max = 50)
     private String username;
 
     @NotNull
-    @Size(min = 1, max = UserVo.PASSWORD_MAX_LENGTH)
+    @Size(min = 1, max = UserVo.PASSWORD_MAX_LENGTH, message =
+        "允许的密码长度区间为["+1+"-" +UserVo.PASSWORD_MAX_LENGTH+"]")
     private String password;
 
     private Boolean rememberMe;

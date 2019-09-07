@@ -1,8 +1,9 @@
 package com.albedo.java.common.persistence;
 
 import com.albedo.java.util.PublicUtil;
-import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
@@ -18,33 +19,32 @@ public class PageQuery<T> extends Page<T> {
     private static final String LIMIT = "limit";
     private static final String ORDER_BY_FIELD = "orderByField";
     private static final String IS_ASC = "isAsc";
-
-    public PageQuery(Pageable pageable, Map<String, Object> params) {
-
+    public PageQuery(long current, long size){
+        super(current, size);
+    }
+    public PageQuery(Pageable pageable) {
         super(pageable.getPageNumber()
-                , pageable.getPageSize());
-        if(PublicUtil.isNotEmpty(params)) {
-            this.setCondition(params);
-        }
-
+            , pageable.getPageSize());
         if (pageable.getSort()!=null) {
             Iterator<Sort.Order> iterator = pageable.getSort().iterator();
             while (iterator.hasNext()){
                 Sort.Order order = iterator.next();
                 if(order.getDirection().isAscending()){
-                    if(this.getAscs() == null) {
-                        this.setAscs(Lists.newArrayList());
+                    if(PublicUtil.isEmpty(this.ascs())) {
+                        this.setAscs(Lists.newArrayList(order.getProperty()));
+                    }else{
+                        ArrayUtils.add(this.ascs(), order.getProperty());
                     }
-                    this.getAscs().add(order.getProperty());
+
                 }else if(order.getDirection().isDescending()){
-                    if(this.getDescs() == null) {
-                        this.setDescs(Lists.newArrayList());
+                    if(PublicUtil.isEmpty(this.descs())) {
+                        this.setDescs(Lists.newArrayList(order.getProperty()));
+                    }else{
+                        ArrayUtils.add(this.descs(), order.getProperty());
                     }
-                    this.getDescs().add(order.getProperty());
+
                 }
             }
-        }else{
-            this.setAsc(false);
         }
 
     }

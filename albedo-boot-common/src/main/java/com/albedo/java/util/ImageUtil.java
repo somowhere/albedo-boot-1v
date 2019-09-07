@@ -43,7 +43,7 @@ public class ImageUtil {
         int width = -1;
         try {
             is = new FileInputStream(file);
-            src = javax.imageio.ImageIO.read(is);
+            src = ImageIO.read(is);
             width = src.getWidth(null); // 得到源图宽
             is.close();
         } catch (Exception e) {
@@ -74,7 +74,7 @@ public class ImageUtil {
         int height = -1;
         try {
             is = new FileInputStream(file);
-            src = javax.imageio.ImageIO.read(is);
+            src = ImageIO.read(is);
             height = src.getHeight(null); // 得到源图高
             is.close();
         } catch (Exception e) {

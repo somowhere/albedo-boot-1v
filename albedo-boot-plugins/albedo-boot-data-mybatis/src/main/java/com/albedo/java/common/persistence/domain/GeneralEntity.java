@@ -1,18 +1,13 @@
 package com.albedo.java.common.persistence.domain;
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.annotations.TableName;
-import com.baomidou.mybatisplus.enums.IdType;
+
 import com.albedo.java.util.config.SystemConfig;
 import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import org.springframework.data.annotation.Transient;
 
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  * 通常的数据基类 copyright 2014 albedo all right reserved author somewhere created on 2014年12月31日 下午1:57:09
@@ -30,7 +25,7 @@ public abstract class GeneralEntity<T extends Model>  extends Model<T> implement
     /*** 状态 已删除 */
     public static final Integer FLAG_DELETE = -2;
     /**
-     * 状态（-2：删除；-1：停用 0：正常 1:审核）
+     * 状态（-1：删除；0：停用 1：正常）
      */
     public static final String F_STATUS = "status";
     /*** ID */

@@ -1,6 +1,6 @@
 package com.albedo.java.web.filter;
 
-import com.albedo.java.common.config.AlbedoProperties;
+import com.albedo.java.common.config.ApplicationProperties;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -10,10 +10,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class BodyFilter extends OncePerRequestFilter {
-    private final AlbedoProperties albedoProperties;
+    private final ApplicationProperties applicationProperties;
 
-    public BodyFilter(AlbedoProperties albedoProperties) {
-        this.albedoProperties = albedoProperties;
+    public BodyFilter(ApplicationProperties applicationProperties) {
+        this.applicationProperties = applicationProperties;
     }
 
     @Override

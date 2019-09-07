@@ -1,15 +1,11 @@
 package com.albedo.java.web.rest;
 
 import com.albedo.java.AlbedoBootWebApp;
-import com.albedo.java.common.config.AlbedoProperties;
 import com.albedo.java.common.security.MailService;
 import com.albedo.java.common.security.SecurityUtil;
-import com.albedo.java.common.security.jwt.TokenProvider;
 import com.albedo.java.modules.sys.domain.User;
-import com.albedo.java.modules.sys.repository.UserRepository;
 import com.albedo.java.modules.sys.service.UserService;
 import com.albedo.java.modules.sys.web.UserResource;
-import com.albedo.java.util.PublicUtil;
 import com.albedo.java.util.domain.Globals;
 import com.albedo.java.vo.account.LoginVo;
 import org.junit.Before;
@@ -20,13 +16,10 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.mockito.Matchers.anyObject;
@@ -50,8 +43,8 @@ public class AccoutResourceIntTest {
     @Mock
     private UserService userService;
 
-//    @Mock
-//    private MailService mockMailService;
+    @Mock
+    private MailService mockMailService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -64,7 +57,7 @@ public class AccoutResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-//        doNothing().when(mockMailService).sendActivationEmail(anyObject());
+        doNothing().when(mockMailService).sendActivationEmail(anyObject());
 
 //        AccoutResource accountResource =
 //            new AccoutResource(tokenProvider, authenticationManager);

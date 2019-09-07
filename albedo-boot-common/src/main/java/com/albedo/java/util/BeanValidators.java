@@ -99,7 +99,8 @@ public class BeanValidators {
     public static List<String> extractPropertyAndMessageAsList(Set<? extends ConstraintViolation> constraintViolations, String separator) {
         List<String> errorMessages = Lists.newArrayList();
         for (ConstraintViolation violation : constraintViolations) {
-            errorMessages.add(violation.getPropertyPath() + separator + violation.getMessage());
+            //violation.getPropertyPath() + separator +
+            errorMessages.add( violation.getMessage());
         }
         return errorMessages;
     }
@@ -113,7 +114,8 @@ public class BeanValidators {
         List<String> errorMessages = Lists.newArrayList();
         List<ObjectError> allErrors = extractPropertyAndMessage(methodArgumentNotValidException);
         for (ObjectError violation : allErrors) {
-            errorMessages.add(violation.getCodes()[0] + separator + violation.getDefaultMessage() + ";");
+            //violation.getCodes()[0] + separator +
+            errorMessages.add(violation.getDefaultMessage() + ";");
         }
         return errorMessages;
 

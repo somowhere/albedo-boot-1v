@@ -31,9 +31,9 @@ public @interface ExcelField {
     int type() default 0;
 
     /**
-     * 仅字符串处理 是否去空格（0：是；1：否）
+     * 仅字符串处理 是否去空格（true：是；false：否）
      */
-    int trim() default 0;
+    boolean trim() default true;
 
     /**
      * 导出字段对齐方式（0：自动；1：靠左；2：居中；3：靠右） 备注：Integer/Long类型设置居右对齐（align=3）

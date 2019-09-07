@@ -1,5 +1,6 @@
 package com.albedo.java.util;
 
+import com.albedo.java.util.base.Assert;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -170,27 +171,42 @@ public class HttpUtil {
      * 下载文件
      *
      * @param path     文件URL
-     * @param savePath 保存路径
-     * @param fileName 文件名
      */
-    public static void downloadFile(String path, String savePath, String fileName) throws Exception {
+    public static InputStream downloadFile(String path) throws Exception {
         HttpClient httpClient = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(path);
         HttpResponse response = httpClient.execute(httpGet);
-        File dir = new File(savePath);
-        if (!dir.exists())
-            dir.mkdirs();
-        File saveFile = new File(dir, fileName);
-        BufferedInputStream bis = new BufferedInputStream(response.getEntity().getContent());
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(saveFile));
-        byte tmp[] = new byte[1024];
-        int len = 0;
-        while ((len = bis.read(tmp)) != -1) {
-            bos.write(tmp, 0, len);
+        return response.getEntity().getContent();
+    }
+
+    /**
+     * 下载文件
+     *
+     * @param url     文件URL
+     * @param descFileName 保存路径
+     */
+    public static void downloadFile(String url, String descFileName)  {
+        try{
+            HttpClient httpClient = HttpClients.createDefault();
+            HttpGet httpGet = new HttpGet(url);
+            HttpResponse response = httpClient.execute(httpGet);
+            FileUtil.deleteDirectory(descFileName);
+            FileUtil.createFile(descFileName);
+            File saveFile = new File(descFileName);
+            BufferedInputStream bis = new BufferedInputStream(response.getEntity().getContent());
+            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(saveFile));
+            byte tmp[] = new byte[1024];
+            int len = 0;
+            while ((len = bis.read(tmp)) != -1) {
+                bos.write(tmp, 0, len);
+            }
+            bis.close();
+            bos.flush();
+            bos.close();
+        }catch (Exception e){
+            logger.error("download error:{}", e);
         }
-        bis.close();
-        bos.flush();
-        bos.close();
+
     }
 
     /**
