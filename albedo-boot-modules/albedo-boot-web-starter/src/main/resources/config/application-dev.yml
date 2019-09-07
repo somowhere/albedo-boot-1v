@@ -33,13 +33,6 @@ spring:
                 prepStmtCacheSize: 250
                 prepStmtCacheSqlLimit: 2048
                 useServerPrepStmts: true
-    mail:
-        host: localhost
-        port: 25
-        username:
-        password:
-    messages:
-        cache-seconds: 1
     mvc:
 #        view:
 #            prefix: /WEB-INF/views/
@@ -51,13 +44,15 @@ spring:
 #       port: 6379
     web:
         root:
-            prefix: albedo-boot-ui-angular/target/www/app/
+            prefix: albedo-boot-ui-vue/target/dist/
 
 
 server:
-    port: 8060
+    port: 8061
 #    jsp-servlet:
 #        class-name: org.apache.jasper.servlet.JspServlet
+
+
 
 # ===================================================================
 # Albedo specific properties

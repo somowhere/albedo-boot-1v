@@ -76,13 +76,13 @@
                             </span>
                         </div>
                     <#elseif c.showType == "userselect">
-                        <alb-tree-select name="${c.simpleJavaField}Id" cssClass="<#if !c.nullable>required</#if>" allowClear="true" labelName="${c.javaFieldShowName}" value="{{${className}.${c.simpleJavaField}Id}}" labelValue="<@jspEl />{(${className}.${c.javaFieldName})!}"
+                        <alb-tree-select name="${c.simpleJavaField}Id" cssClass="<#if !c.nullable>required</#if>" allowClear="true" labelName="${c.javaFieldShowName}" value="{{${className}.${c.simpleJavaField}Id}}" labelValue="{{${className}.${c.javaFieldName}}}"
                         title="选择用户" url="{{ctx}}/sys/org/findTreeData?showType=3" notAllowSelectParent="true"> </alb-tree-select>
                     <#elseif c.showType == "orgselect">
-                        <alb-tree-select name="${c.simpleJavaField}Id" cssClass="<#if !c.nullable>required</#if>" allowClear="true" labelName="${c.javaFieldShowName}" value="{{${className}.${c.simpleJavaField}Id}}" labelValue="<@jspEl />{(${className}.${c.javaFieldName})!}"
+                        <alb-tree-select name="${c.simpleJavaField}Id" cssClass="<#if !c.nullable>required</#if>" allowClear="true" labelName="${c.javaFieldShowName}" value="{{${className}.${c.simpleJavaField}Id}}" labelValue="{{${className}.${c.javaFieldName}}}"
                         title="选择部门" url="{{ctx}}/sys/org/findTreeData?showType=1" notAllowSelectParent="true"> </alb-tree-select>
                     <#elseif c.showType == "areaselect">
-                        <alb-tree-select name="${c.simpleJavaField}Id" cssClass="<#if !c.nullable>required</#if>" allowClear="true" labelName="${c.javaFieldShowName}" value="{{${className}.${c.simpleJavaField}Id}}" labelValue="<@jspEl />{(${className}.${c.javaFieldName})!}"
+                        <alb-tree-select name="${c.simpleJavaField}Id" cssClass="<#if !c.nullable>required</#if>" allowClear="true" labelName="${c.javaFieldShowName}" value="{{${className}.${c.simpleJavaField}Id}}" labelValue="{{${className}.${c.javaFieldName}}}"
                         title="选择区域" url="{{ctx}}/sys/area/findTreeData" notAllowSelectParent="true"> </alb-tree-select>
                     <#elseif c.showType == "fileselect">
                         <<@at/>albedo.fileInput name="${c.javaFieldId}" value="{{${className}.${c.javaFieldId}}}" cssClass="<#if !c.nullable>required</#if>" type="files"> </<@at/>albedo.fileInput>

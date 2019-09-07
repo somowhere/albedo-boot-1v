@@ -15,7 +15,7 @@ eureka:
         prefer-ip-address: true
     client:
         service-url:
-            defaultZone: http://admin:${jhipster.registry.password}@localhost:8761/eureka/
+            defaultZone: http://admin:${jhipster.registry.password}@localhost:8762/eureka/
 
 spring:
     profiles:
@@ -82,7 +82,7 @@ spring:
 #       port: 6379
     web:
         root:
-            prefix: albedo-boot-ui-angular/target/www/app/
+            prefix: albedo-boot-ui-vue/target/dist/
 
 
 server:
