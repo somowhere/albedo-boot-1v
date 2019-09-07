@@ -17,9 +17,9 @@ let iconfontVersion = ['567566_r22zi6t8noas8aor', '599693_0b5sleso3f1j1yvi', '73
 let iconfontUrl = `//at.alicdn.com/t/font_$key.css`;
 let codeUrl = `/sys/code`
 if (process.env.NODE_ENV == 'development') {
-  baseUrl = `http://localhost:8061/api`;
+  baseUrl = `http://localhost:8071/api`;
 } else if (process.env.NODE_ENV == 'production') {
-  baseUrl = `http://localhost:8061/api`;
+  baseUrl = `http://localhost:8071/api`;
 }
 
 export {
