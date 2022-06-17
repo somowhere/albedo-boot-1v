@@ -12,7 +12,7 @@
     <artifactId>albedo-boot-common</artifactId>
     <properties>
         <logstash-logback-encoder.version>4.7</logstash-logback-encoder.version>
-        <fastjson.version>1.2.31</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <!--<spring.data.mybatis.version>1.0.17.BUILD-SNAPSHOT</spring.data.mybatis.version>-->
         <guava.version>20.0</guava.version>
         <httpclient.version>4.3.5</httpclient.version>
